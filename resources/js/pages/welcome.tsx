@@ -17,31 +17,38 @@ const products = [
         name: 'LIVING ORGANIC',
         price: 21,
         rating: '4.6',
-        image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1602928355784-b05f7a78b842?q=80&w=835&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
         name: 'PERFECT START',
         price: 16,
         rating: '4.8',
-        image: 'https://images.unsplash.com/photo-1589035981032-0b3b9d7a4f3f?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1602928355784-b05f7a78b842?q=80&w=835&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
         name: 'ORGANIC BOOSTER',
         price: 18,
         rating: '4.5',
-        image: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1709372026846-8d2fda4a7ee5?q=80&w=881&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
         name: 'PENNINGTON',
         price: 24,
         rating: '4.6',
-        image: 'https://images.unsplash.com/photo-1604335399104-9b3b8c9b2bfa?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1627828094454-accc9a7c20e9?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    },
+    {
+        name: 'PENNINGTON',
+        price: 24,
+        rating: '4.6',
+        image: 'https://images.unsplash.com/photo-1627828094454-accc9a7c20e9?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
 ];
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [allProduct, setAllProduct] = useState(false);
 
     return (
         <div className="min-h-screen bg-white text-black">
@@ -100,23 +107,27 @@ export default function Welcome() {
             </div>
 
             {/* HERO */}
-            <section className="grid grid-cols-1 gap-4 px-4 py-6 md:grid-cols-2 md:px-[6rem] md:py-12">
+            <section className="grid h-screen grid-cols-1 gap-4 px-4 py-6 md:grid-cols-2">
                 <div className="flex flex-col items-start justify-center gap-8 rounded-3xl bg-green-500/20 p-6 md:p-10">
-                    <div>
-                        <h1 className="text-3xl font-bold md:text-4xl">Jessamyn</h1>
-                        <p className="mt-2 text-justify text-base md:text-lg">
+                    <div className="flex flex-col items-start justify-center">
+                        <h1 className="text-3xl font-bold md:text-4xl">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea accusantium obcaecati praesentium excepturi neque nulla nobis
+                            vitae,
+                        </h1>
+                        <p className="mt-2 text-base md:text-lg">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi accusantium nulla, facere voluptatibus officiis ipsa
                             exercitationem sunt, fugit sed ex non, cum quidem quis. Eius, rem omnis. Iusto, recusandae minus?
                         </p>
                     </div>
-
-                    <div className="flex w-full flex-wrap gap-3">
-                        <Button className="min-w-[140px] flex-1 px-6">Explore</Button>
-                        <Button className="min-w-[140px] flex-1 px-6">Learn More</Button>
+                    <div className="flex gap-2">
+                        <Button className="min-w-[140px] px-6">Explore</Button>
+                        <Button variant="outline" className="border-black bg-transparent px-6 py-3 text-black">
+                            Learn More
+                        </Button>
                     </div>
                 </div>
 
-                <div className="relative h-64 overflow-hidden rounded-3xl md:h-[34rem]">
+                <div className="relative overflow-hidden rounded-3xl">
                     <img
                         src="https://images.unsplash.com/photo-1662467191303-d1010dfbb89c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0"
                         alt="Hero"
@@ -164,16 +175,19 @@ export default function Welcome() {
             </section>
 
             {/* OBJECTIVE (consolidated) */}
-            <section className="flex flex-col items-start gap-8 px-4 py-12 md:flex-row md:gap-12 md:px-[6rem] md:py-20">
-                <div className="max-w-xl space-y-5 pt-4">
-                    <p className="text-sm font-semibold text-green-600">Our solution</p>
-                    <h2 className="text-3xl leading-tight font-semibold md:text-5xl">It Starts With Growers In Mind.</h2>
-                    <p className="leading-relaxed text-gray-600">
-                        IFDC believes that the key to global food security starts with the soil and ends in the supermarket. We seek to develop better
-                        fertilizer and production technologies, transfer these improved technologies to small farmers, and connect these farmers to
-                        efficient and profitable markets. By working with strategic partners, we build local capacity and ensure sustainable impact.
-                    </p>
-                    <Button variant="outline" className="mt-4 w-fit rounded-xl border-gray-200 px-6 py-3">
+            <section className="flex h-screen flex-col items-start gap-8 px-4 py-12 md:flex-row md:gap-12 md:px-[6rem] md:py-20">
+                <div className="flex h-full max-w-xl flex-col items-start justify-center gap-10 space-y-5">
+                    <span>
+                        <p className="text-sm font-semibold text-green-600">Our solution</p>
+                        <h2 className="text-3xl leading-tight font-semibold md:text-5xl">It Starts With Growers In Mind.</h2>
+                        <p className="leading-relaxed text-gray-600">
+                            IFDC believes that the key to global food security starts with the soil and ends in the supermarket. We seek to develop
+                            better fertilizer and production technologies, transfer these improved technologies to small farmers, and connect these
+                            farmers to efficient and profitable markets. By working with strategic partners, we build local capacity and ensure
+                            sustainable impact.
+                        </p>
+                    </span>
+                    <Button variant="outline" className="hidden border-gray-200 bg-white sm:inline-flex">
                         Other Solutions
                     </Button>
                 </div>
@@ -216,24 +230,27 @@ export default function Welcome() {
                         </p>
                     </div>
                     <div className="mt-4 md:mt-0">
-                        <Button variant="outline" className="h-10 self-start">
+                        <Button variant="outline" className="hidden border-gray-200 bg-white sm:inline-flex">
                             Show More Products
                         </Button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-5">
                     {products.map((p) => (
-                        <div key={p.name} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 md:p-6">
-                            <div className="flex items-center justify-center">
-                                <img src={p.image} alt={p.name} className="h-40 object-contain md:h-48" />
+                        <div key={p.name} className="rounded-xl bg-white shadow-sm ring-1 ring-gray-100">
+                            <div className="relative flex h-[15rem] w-full items-center justify-center overflow-hidden rounded-xl">
+                                <img src={p.image} alt={p.name} className="absolute h-full w-full object-cover" />
                             </div>
-                            <h3 className="mt-4 font-semibold md:mt-6">{p.name}</h3>
-                            <div className="mt-2 flex items-center gap-4">
-                                <span className="text-lg font-semibold">${p.price}</span>
-                                <span className="text-green-600">
-                                    ( <span className="mr-1 inline-block">★</span> {p.rating}/5 )
-                                </span>
+
+                            <div className="p-2">
+                                <h3 className="mt-4 font-semibold md:mt-6">{p.name}</h3>
+                                <div className="mt-2 flex items-center gap-4">
+                                    <span className="text-lg font-semibold">${p.price}</span>
+                                    <span className="text-green-600">
+                                        ( <span className="mr-1 inline-block">★</span> {p.rating}/5 )
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -326,7 +343,7 @@ export default function Welcome() {
                             </div>
                         </div>
 
-                        <div className="text-sm text-gray-500">&copy; 2023 EverGreen. All rights reserved.</div>
+                        <div className="text-sm text-gray-500">&copy; 2024 EverGreen. All rights reserved.</div>
                     </div>
                 </div>
             </footer>
