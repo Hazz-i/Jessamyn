@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('account', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            
+            $table->string('description')->nullable();
+            $table->boolean('status')->default(false);
+
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

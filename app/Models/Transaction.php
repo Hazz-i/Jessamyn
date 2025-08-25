@@ -8,19 +8,16 @@ class Transaction extends Model
 {
     protected $fillable = [
         'user_id',
-        'account_id',
-        'debit',
-        'credit',
-        'image'
+        'product_id',
+        'status',
+        'image', 
+        'no_resi',
+        'total_price',
+        'quantity',
     ];
 
-    public function account()
+    public function product()
     {
-        return $this->belongsTo(Account::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Product::class);
     }
 }

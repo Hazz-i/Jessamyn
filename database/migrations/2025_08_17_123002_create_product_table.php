@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('description')->nullable();
             $table->integer('stock')->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('status')->default(true);
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');   
         });

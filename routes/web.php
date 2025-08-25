@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\AccountController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -12,19 +13,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::resource('accounts', AccountController::class);
 
-    Route::prefix('dashboard')->group(function () {
-        Route::get('products', function () {
-            return Inertia::render('Dashboard/Products/Index');
-        })->name('dashboard.products.index');
+    // Route::prefix('dashboard')->group(function () {
+    //     Route::get('products', function () {
+    //         return Inertia::render('Dashboard/Products/Index');
+    //     })->name('dashboard.products.index');
 
-        Route::get('products/create', function () {
-            return Inertia::render('Dashboard/Products/Create');
-        })->name('dashboard.products.create');
+    //     Route::get('products/create', function () {
+    //         return Inertia::render('Dashboard/Products/Create');
+    //     })->name('dashboard.products.create');
 
-        Route::post('products', [\App\Http\Controllers\ProductController::class, 'store'])
-            ->name('dashboard.products.store');
-    });
+    //     Route::post('products', [\App\Http\Controllers\ProductController::class, 'store'])
+    //         ->name('dashboard.products.store');
+    // });
 });
 
 Route::fallback(function () {

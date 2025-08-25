@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaction', function (Blueprint $table) {
+        Schema::create('accounting', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email');
-            $table->string('no_resi');
+            $table->string('description');
+            $table->decimal('credit', 10, 2);
+            $table->decimal('debit', 10, 2);
             $table->string('image');
-            $table->decimal('total_price', 10, 2);
-            $table->integer('quantity');
-            $table->enum('status', ['pending', 'processing', 'completed', 'canceled'])->default('pending');
 
-            $table->foreignId('product_id')->constrained('product')->onDelete('cascade');
+            $table->foreignId('account_id')->constrained('account')->onDelete('cascade');
+            $table->foreignId('transaction_id')->constrained('transaction')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaction');
+        Schema::dropIfExists('accounting');
     }
 };
