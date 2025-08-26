@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
-const loginImage = '/jessamyn-brand.png';
+const loginImage = '/jessamynLogin.png';
 
 type LoginForm = {
     email: string;

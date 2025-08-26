@@ -5,33 +5,29 @@ import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Account',
-        href: '/account',
+        title: 'Jurnal Umum',
+        href: '/jurnal-umum',
     },
 ];
 
-export default function Account() {
+export default function JurnalUmum() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Account" />
+            <Head title="Jurnal Umum" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* Product Summary */}
                 <span className="grid gap-1">
-                    <h1 className="text-xl font-medium">Account</h1>
+                    <h1 className="text-xl font-medium">Jurnal Umum</h1>
                     <p className="text-sm text-[#B5B5B5]">
-                        Akun adalah catatan sistematis yang digunakan untuk menggolongkan dan mencatat perubahan (mutasi) pada setiap jenis aset,
-                        kewajiban, modal, pendapatan, maupun beban dalam suatu periode tertentu. Setiap akun menunjukkan saldo dan perubahan yang
-                        terjadi akibat transaksi keuangan, misalnya: kas, piutang usaha, persediaan, utang dagang, modal, penjualan, dan beban gaji.
+                        Jurnal umum adalah catatan kronologis pertama dari setiap transaksi keuangan perusahaan. Semua transaksi dicatat secara
+                        berurutan berdasarkan tanggal kejadian, lengkap dengan akun yang didebit dan dikredit.
                     </p>
                 </span>
 
                 {/* Product List */}
                 <span className="grid gap-2">
-                    <div className="grid gap-1">
-                        <h1 className="text-xl font-medium">Account List</h1>
-                        <p className="text-sm text-[#B5B5B5]">List of account</p>
-                    </div>
+                    <h1 className="text-xl font-medium">Jurnal Umum Details</h1>
 
                     {/* Table */}
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">

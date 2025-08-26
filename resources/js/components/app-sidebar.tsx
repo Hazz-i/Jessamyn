@@ -1,11 +1,10 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import AppLogo from './app-logo';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { UserMenuContent } from './user-menu-content';
 
+const AppLogo = './jessamynLogo.png';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -14,7 +13,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Product',
-        href: '/dashboard',
+        href: '/product',
         icon: 'bx bx-box',
     },
     {
@@ -23,26 +22,28 @@ const mainNavItems: NavItem[] = [
         icon: 'bx bx-user',
     },
     {
-        title: 'Accounting',
-        href: '/dashboard',
+        title: 'Transaction',
+        href: '/transactions',
         icon: 'bx bx-receipt',
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const activityNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: 'bx bx-repo',
+        title: 'Jurnal Umum',
+        href: '/jurnal-umum',
+        icon: 'bx bx-user',
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: 'bx bx-book-open',
+        title: 'Buku Besar',
+        href: '/buku-besar',
+        icon: 'bx bx-receipt',
     },
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -50,7 +51,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
-                                <AppLogo />
+                                <img src={AppLogo} alt="logo aplikasi" />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -59,11 +60,11 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                <NavMain items={activityNavItems} title="Activity" />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+                <UserMenuContent user={auth.user} />
             </SidebarFooter>
         </Sidebar>
     );

@@ -27,6 +27,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     Route::post('products', [\App\Http\Controllers\ProductController::class, 'store'])
     //         ->name('dashboard.products.store');
     // });
+
+    // Dashboard - Route
+    Route::get('product', function () {
+        return Inertia::render('Products/Index');
+    })->name('products.index');
+    Route::get('accounts', function () {
+        return Inertia::render('Accounts/Index');
+    })->name('accounts.index');
+    Route::get('transactions', function () {
+        return Inertia::render('Transactions/Index');
+    })->name('transactions.index');
+
+    // Activity - Accounting Route
+    Route::get('jurnal-umum', function () {
+        return Inertia::render('JurnalUmum/Index');
+    })->name('jurnalUmum.index');
+    Route::get('buku-besar', function () {
+        return Inertia::render('BukuBesar/Index');
+    })->name('bukuBesar.index');
 });
 
 Route::fallback(function () {
