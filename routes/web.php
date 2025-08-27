@@ -6,6 +6,7 @@ use App\Http\Controllers\AccountController;
 
 use App\Models\Product;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -16,7 +17,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::resource('accounts', AccountController::class);
 
     // Route::prefix('dashboard')->group(function () {
     //     Route::get('products', function () {
@@ -32,9 +32,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // });
 
     // Dashboard - Route
-    Route::get('product', function () {
-        return Inertia::render('Products/Index');
-    })->name('products.index');
+    // Route::get('product', function () {
+    //     return Inertia::render('Products/Index');
+    // })->name('products.index');
+
+    Route::resource('product', ProductController::class);
+
     Route::get('accounts', function () {
         return Inertia::render('Accounts/Index');
     })->name('accounts.index');

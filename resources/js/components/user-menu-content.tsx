@@ -1,7 +1,6 @@
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
 
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 
@@ -24,16 +23,22 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={page.url.startsWith('/profile')} tooltip={{ children: 'Profile' }}>
-                            <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
-                                <Settings className="mr-2" />
+                            <Link className="block w-full cursor-pointer" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                                <i className="bx bx-cog mr-2" />
                                 Settings
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild tooltip={{ children: 'Log out' }}>
-                            <Link className="block w-full" method="post" href={route('logout')} as="button" onClick={handleLogout}>
-                                <LogOut className="mr-2" />
+                            <Link
+                                className="block w-full cursor-pointer text-red-500 hover:bg-red-500/10 hover:text-red-600"
+                                method="post"
+                                href={route('logout')}
+                                as="button"
+                                onClick={handleLogout}
+                            >
+                                <i className="bx bx-log-out mr-2" />
                                 Log out
                             </Link>
                         </SidebarMenuButton>
