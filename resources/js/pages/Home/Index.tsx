@@ -1,104 +1,28 @@
+import AppFooter from '@/components/app-footer';
+import AppNavbar from '@/components/app-navbar';
 import { Button } from '@/components/ui/button';
-import { type SharedData } from '@/types';
+import ProductCard from '@/components/ui/product-card';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-import heroUrl from '../../../public/jessamynHero.png';
-import logoUrl from '../../../public/jessamynLogo.png';
+import { useEffect, useState } from 'react';
+import heroUrl from '../../../../public/jessamynHero.png';
 
-const navbarMenu = [
-    { title: 'Home', href: '/' },
-    { title: 'About Us', href: '/about' },
-    { title: 'Products', href: '/products' },
-    { title: 'Contact', href: '/contact' },
-];
-
-const products = [
-    {
-        name: 'Body Massage Oil Bundle (100 ml & 250 ml)',
-        price: '55.000',
-        image: 'https://images.unsplash.com/photo-1602928355784-b05f7a78b842?q=80&w=835&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-    {
-        name: 'Body Massage Oil With Aromatherapy Kanakala',
-        price: '55.000',
-        image: 'https://images.unsplash.com/photo-1602928355784-b05f7a78b842?q=80&w=835&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-    {
-        name: 'Body Massage Oil With Aromatherapy Mr Muscle',
-        price: '55.000',
-        image: 'https://images.unsplash.com/photo-1709372026846-8d2fda4a7ee5?q=80&w=881&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-    {
-        name: 'Body Massage Oil With Aromatherapy Mr Muscle',
-        price: '55.000',
-        image: 'https://images.unsplash.com/photo-1627828094454-accc9a7c20e9?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-    {
-        name: 'Body Massage Oil Bundle (100 ml & 250 ml)',
-        price: '55.000',
-        image: 'https://images.unsplash.com/photo-1627828094454-accc9a7c20e9?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-];
-
-export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
+const Welcome = () => {
+    const { auth, products } = usePage().props;
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [allProduct, setAllProduct] = useState(false);
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollTop(window.scrollY > 300);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <div className="min-h-screen bg-white text-black">
-            {/* header */}
-            <header className="container mx-auto flex items-center justify-between md:px-8">
-                <div className="relative h-20 w-auto max-w-[220px]">
-                    <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
-                </div>
-
-                <nav className="hidden md:block">
-                    <ul className="flex space-x-4">
-                        {navbarMenu.map((item) => (
-                            <li key={item.title}>
-                                <Link href={item.href} className="hover:underline">
-                                    {item.title}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-
-                <div className="flex items-center gap-3">
-                    <Button variant="outline" className="hidden border-gray-200 text-primary sm:inline-flex">
-                        Get Started
-                    </Button>
-
-                    <button
-                        className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
-                        onClick={() => setMobileOpen((s) => !s)}
-                        aria-label="Toggle menu"
-                    >
-                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d={mobileOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
-                            />
-                        </svg>
-                    </button>
-                </div>
-            </header>
-
-            {/* mobile menu */}
-            <div className={`${mobileOpen ? 'block' : 'hidden'} px-4 pb-4 md:hidden`}>
-                <ul className="flex flex-col space-y-2">
-                    {navbarMenu.map((item) => (
-                        <li key={item.title}>
-                            <Link href={item.href} className="block rounded-md px-3 py-2 hover:bg-gray-100">
-                                {item.title}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            {/* Navbar */}
+            <AppNavbar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
             {/* HERO */}
             <section className="container mx-auto grid h-[90vh] grid-cols-1 gap-4 px-4 md:grid-cols-2">
@@ -149,7 +73,10 @@ export default function Welcome() {
             </section>
 
             {/* About US */}
-            <section className="container mx-auto flex h-screen flex-col items-start gap-8 px-4 py-12 md:flex-row md:gap-12 md:px-[6rem] md:py-20">
+            <section
+                id="about-section"
+                className="container mx-auto flex h-screen flex-col items-start gap-8 px-4 py-12 md:flex-row md:gap-12 md:px-[6rem] md:py-20"
+            >
                 <div className="my-auto flex max-w-xl flex-col items-start justify-center gap-2 space-y-5">
                     <span>
                         <p className="text-sm font-semibold text-primary-foreground">About Us</p>
@@ -194,7 +121,7 @@ export default function Welcome() {
             </section>
 
             {/* PRODUCTS */}
-            <section className="container mx-auto px-4 pb-12 md:px-[5rem] lg:px-[8rem]">
+            <section id="products-section" className="container mx-auto px-4 pb-12 md:px-[5rem] lg:px-[8rem]">
                 <div className="mb-8 flex flex-col items-center justify-between md:flex-row">
                     <div className="max-w-3xl">
                         <h2 className="text-2xl font-bold text-primary-foreground md:text-4xl">Explore our product</h2>
@@ -204,24 +131,17 @@ export default function Welcome() {
                     </div>
                     <div className="mt-4 md:mt-0">
                         <Button variant="outline" className="hidden border-gray-200 text-primary sm:inline-flex">
-                            Show More Products
+                            <Link href="/all-products">Show More Products</Link>
                         </Button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-5">
-                    {products.map((p) => (
-                        <div key={p.name} className="rounded-xl bg-white shadow-sm ring-1 ring-gray-100">
-                            <div className="relative flex h-[15rem] w-full items-center justify-center overflow-hidden rounded-t-xl">
-                                <img src={p.image} alt={p.name} className="absolute h-full w-full object-cover" />
-                            </div>
-
-                            <div className="grid gap-5 p-2">
-                                <h3 className="mt-2 font-semibold">{p.name}</h3>
-                                <span className="font-medium text-primary-foreground">Rp. {p.price};</span>
-                            </div>
-                        </div>
-                    ))}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
+                    {Array.isArray(products) && products.length > 0 ? (
+                        products.map((p) => <ProductCard key={p.id} product={p} />)
+                    ) : (
+                        <div className="col-span-full text-center text-gray-400">No products available.</div>
+                    )}
                 </div>
             </section>
 
@@ -246,7 +166,7 @@ export default function Welcome() {
             </section>
 
             {/* CONTACT US */}
-            <section className="container mx-auto grid grid-cols-1 gap-8 py-16 md:grid-cols-2 md:px-[6rem] md:py-20">
+            <section id="contact-section" className="container mx-auto grid grid-cols-1 gap-8 py-16 md:grid-cols-2 md:px-[6rem] md:py-20">
                 {/* Map */}
                 <div className="flex items-center justify-center">
                     <iframe
@@ -306,75 +226,23 @@ export default function Welcome() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="bg-[#AFC29E] text-gray-800">
-                <div className="container mx-auto px-4 py-10 md:px-12">
-                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                        {/* Logo & Address */}
-                        <div>
-                            <img src={logoUrl} alt="Jessamyn" className="mb-2 h-16" />
-                            <p className="text-xs leading-tight font-medium">
-                                Tunjungan RT.03/RW.02, Gatak 2, Selomartani,
-                                <br />
-                                Kec. Kalasan, Kabupaten Sleman, Daerah Istimewa
-                                <br />
-                                Yogyakarta 55571
-                            </p>
-                        </div>
+            {/* Footer */}
+            <AppFooter />
 
-                        <div className="flex w-full items-start justify-between">
-                            {/* Company */}
-                            <div>
-                                <h4 className="mb-2 font-semibold text-primary-foreground">Company</h4>
-                                <ul className="space-y-2 text-sm">
-                                    <li>Home</li>
-                                    <li>About Us</li>
-                                    <li>Products</li>
-                                    <li>Contacts</li>
-                                </ul>
-                            </div>
-                            {/* Products */}
-                            <div>
-                                <h4 className="mb-2 font-semibold text-primary-foreground">Products</h4>
-                                <ul className="space-y-2 text-sm">
-                                    <li>Produk Herbal Premium</li>
-                                    <li>Relaksasi & Aromaterapi</li>
-                                    <li>Konsultasi Kesehatan Alami</li>
-                                </ul>
-                            </div>
-                            {/* Get In Touch */}
-                            <div>
-                                <h4 className="mb-2 font-semibold text-primary-foreground">Get In Touch</h4>
-                                <p className="mb-2 text-sm">jessamyncompany@gmail.com</p>
-                                <div className="flex gap-2">
-                                    <span className="bg-primary-foreground inline-flex h-7 w-7 items-center justify-center rounded text-primary">
-                                        <i className="bx bxl-tiktok text-xl" />
-                                    </span>
-                                    <span className="bg-primary-foreground inline-flex h-7 w-7 items-center justify-center rounded text-primary">
-                                        <i className="bx bxl-shopify text-xl" />
-                                    </span>
-                                    <span className="bg-primary-foreground inline-flex h-7 w-7 items-center justify-center rounded text-primary">
-                                        <i className="bx bxl-instagram text-xl" />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="my-6 h-px bg-primary-foreground" />
-
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                        <div className="flex items-center gap-2 text-sm text-primary-foreground">
-                            <span className="mr-1">&#169;</span>
-                            2025 Jessamyn, All rights reserved.
-                        </div>
-                        <div className="flex gap-6 text-sm text-primary-foreground">
-                            <span>Terms & Conditions</span>
-                            <span>Privacy Policy</span>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            {/* Scroll to top button */}
+            {showScrollTop && (
+                <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="fixed right-8 bottom-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:bg-primary-foreground hover:text-primary"
+                    aria-label="Scroll to top"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+            )}
         </div>
     );
-}
+};
+
+export default Welcome;

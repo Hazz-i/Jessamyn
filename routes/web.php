@@ -4,9 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\AccountController;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+use App\Models\Product;
+use App\Http\Controllers\HomeController;
+
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/all-products', [HomeController::class, 'products'])->name('products');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
