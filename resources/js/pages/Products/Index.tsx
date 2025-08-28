@@ -2,7 +2,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -46,9 +47,132 @@ export default function Product() {
         return items;
     };
 
+    // Modal state
+    const [showModal, setShowModal] = useState(false);
+
+    // Form state
+    const { data, setData, post, processing, reset, errors } = useForm({
+        name: '',
+        description: '',
+        price: '',
+        stock: '',
+        status: true,
+        image: null, // Add image field
+    });
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setData('image', e.target.files?.[0] ?? null);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Use FormData for file upload
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price', data.price);
+        formData.append('stock', data.stock);
+        formData.append('status', data.status ? '1' : '0');
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+
+        post(route('product.store'), {
+            data: formData,
+            onSuccess: () => {
+                setShowModal(false);
+                reset();
+            },
+            forceFormData: true,
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product" />
+
+            {/* Add Product Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+                        <h2 className="mb-4 text-lg font-bold">Add Product</h2>
+                        <form onSubmit={handleSubmit} className="grid gap-3">
+                            <input
+                                type="text"
+                                placeholder="Name"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                className="rounded border px-3 py-2"
+                            />
+                            {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
+
+                            <textarea
+                                placeholder="Description"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                className="rounded border px-3 py-2"
+                            />
+                            {errors.description && <span className="text-xs text-red-500">{errors.description}</span>}
+
+                            <input
+                                type="number"
+                                placeholder="Price"
+                                value={data.price}
+                                onChange={(e) => setData('price', e.target.value)}
+                                className="rounded border px-3 py-2"
+                            />
+                            {errors.price && <span className="text-xs text-red-500">{errors.price}</span>}
+
+                            <input
+                                type="number"
+                                placeholder="Stock"
+                                value={data.stock}
+                                onChange={(e) => setData('stock', e.target.value)}
+                                className="rounded border px-3 py-2"
+                            />
+                            {errors.stock && <span className="text-xs text-red-500">{errors.stock}</span>}
+
+                            <label className="flex items-center gap-2">
+                                <input type="checkbox" checked={data.status} onChange={(e) => setData('status', e.target.checked)} />
+                                Active
+                            </label>
+
+                            {/* Image upload field with button and file name display */}
+                            <div>
+                                <label
+                                    htmlFor="image-upload"
+                                    className="inline-flex cursor-pointer items-center rounded bg-primary px-4 py-2 text-white"
+                                >
+                                    <i className="bx bx-upload mr-2"></i>
+                                    {data.image ? 'Change Image' : 'Upload Image'}
+                                </label>
+                                <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                                {data.image && (
+                                    <span className="mt-2 block text-sm text-gray-700">
+                                        Selected file: {typeof data.image === 'string' ? data.image : data.image.name}
+                                    </span>
+                                )}
+                                {errors.image && <span className="text-xs text-red-500">{errors.image}</span>}
+                            </div>
+
+                            <div className="mt-2 flex justify-end gap-2">
+                                <button
+                                    type="button"
+                                    className="rounded bg-gray-200 px-4 py-2"
+                                    onClick={() => setShowModal(false)}
+                                    disabled={processing}
+                                >
+                                    Cancel
+                                </button>
+                                <button type="submit" className="rounded bg-primary px-4 py-2 text-white" disabled={processing}>
+                                    {processing ? 'Saving...' : 'Save'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* Product Summary */}
@@ -114,7 +238,10 @@ export default function Product() {
 
                         <div className="me-1 flex items-center justify-center gap-2">
                             <p className="text-sm font-semibold text-primary">Add Product</p>
-                            <button className="flex cursor-pointer items-center justify-center rounded-lg bg-primary p-2">
+                            <button
+                                className="flex cursor-pointer items-center justify-center rounded-lg bg-primary p-2"
+                                onClick={() => setShowModal(true)}
+                            >
                                 <i className="bx bx-plus text-xl text-white" />
                             </button>
                         </div>
@@ -145,7 +272,11 @@ export default function Product() {
                                             </TableCell>
                                             <TableCell className="flex items-center gap-2 text-center font-medium">
                                                 <span className="h-10 w-10 overflow-hidden rounded-sm">
-                                                    <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                                                    <img
+                                                        src={p.image ? `/storage/${p.image.replace(/^public\//, '')}` : '/default-image.png'}
+                                                        alt={p.name}
+                                                        className="h-full w-full object-cover"
+                                                    />
                                                 </span>
                                                 {p.name}
                                             </TableCell>
