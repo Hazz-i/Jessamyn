@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('image');
 
             $table->foreignId('account_id')->constrained('account')->onDelete('cascade');
-            $table->foreignId('transaction_id')->constrained('transaction')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

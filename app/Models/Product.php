@@ -9,16 +9,17 @@ class Product extends Model
 {
     use HasFactory;
     protected $table = 'product';
+    
     protected $fillable = [
         'name',
+        'image',
+        'sub_image',
+        'category',
         'description',
         'price',
         'stock',
-        'image',
-        'status',
-        'user_id'
+        'user_id',
     ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -27,5 +28,10 @@ class Product extends Model
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function productVariants()
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 }

@@ -13,9 +13,9 @@ class AccountController extends Controller
      */
     public function index()
     {
-        $account = Account::all();
+        $accounts = Account::all();
         return Inertia::render('Accounts/Index', [
-            'account' => $account,
+            'accounts' => $accounts,
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
@@ -28,7 +28,7 @@ class AccountController extends Controller
      */
     public function create()
     {
-        //
+    return Inertia::render('Accounts/Create');
     }
 
     /**
@@ -36,7 +36,22 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|boolean',
+        ]);
+
+        // Create account respecting fillable and set status explicitly if not fillable
+        $account = new Account([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'user_id' => auth()->id(),
+        ]);
+        $account->status = (bool) $validated['status'];
+        $account->save();
+
+        return redirect()->route('accounts.index')->with('success', 'Account created successfully.');
     }
 
     /**
@@ -52,7 +67,9 @@ class AccountController extends Controller
      */
     public function edit(Account $account)
     {
-        //
+        return Inertia::render('Accounts/Edit', [
+            'account' => $account,
+        ]);
     }
 
     /**
@@ -60,7 +77,26 @@ class AccountController extends Controller
      */
     public function update(Request $request, Account $account)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'status' => 'sometimes|required|boolean',
+        ]);
+
+        // Update only provided fields
+        if (array_key_exists('name', $validated)) {
+            $account->name = $validated['name'];
+        }
+        if (array_key_exists('description', $validated)) {
+            $account->description = $validated['description'];
+        }
+        if (array_key_exists('status', $validated)) {
+            $account->status = (bool) $validated['status'];
+        }
+
+        $account->save();
+
+        return redirect()->route('accounts.index')->with('success', 'Account updated successfully.');
     }
 
     /**
@@ -68,6 +104,8 @@ class AccountController extends Controller
      */
     public function destroy(Account $account)
     {
-        //
+    $account->delete();
+
+    return redirect()->route('accounts.index')->with('success', 'Account deleted successfully.');
     }
 }

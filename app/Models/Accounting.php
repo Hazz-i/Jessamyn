@@ -22,11 +22,6 @@ class Accounting extends Model
         return $this->belongsTo(Account::class);
     }
 
-    public function transaction()
-    {
-        return $this->belongsTo(Transaction::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
