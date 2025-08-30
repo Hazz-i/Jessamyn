@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,7 @@ export default function EditProductVariant({
     const [internalOpen, setInternalOpen] = useState(false);
     const open = externalOpen ?? internalOpen;
     const setOpen = setExternalOpen ?? setInternalOpen;
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const { data, setData, put, processing, errors, reset, clearErrors, transform } = useForm<VariantForm>({
         variant: String(variant.variant ?? ''),
@@ -62,6 +63,11 @@ export default function EditProductVariant({
                 clearErrors();
             },
         });
+    };
+
+    const handleDelete = () => {
+        // Add your delete logic here
+        setShowDeleteConfirm(false);
     };
 
     return (
@@ -115,15 +121,38 @@ export default function EditProductVariant({
                     </div>
 
                     <DialogFooter className="flex flex-col gap-2 sm:flex-row">
-                        <DialogClose asChild>
-                            <DeleteProductVariant productId={productId} id={variant.id} name={variant.variant} />
-                        </DialogClose>
+                        {/* Render inline confirm delete (no nested Dialog) */}
+                        <DeleteProductVariant
+                            productId={productId}
+                            id={variant.id}
+                            name={variant.variant}
+                            onSuccess={() => {
+                                // close parent edit dialog after delete
+                                setOpen(false);
+                            }}
+                            useDialog={false} // IMPORTANT: inline confirm, no overlay
+                        />
                         <Button type="submit" disabled={processing}>
                             {processing ? 'Saving' : 'Save Changes'}
                         </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+                    <div className="bg-white p-6 rounded shadow">
+                        <p>Are you sure you want to delete this variant?</p>
+                        <div className="flex gap-2 mt-4">
+                            <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Dialog>
     );
 }
