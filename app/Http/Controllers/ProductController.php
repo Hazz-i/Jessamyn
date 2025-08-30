@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -77,9 +78,6 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Product $product)
     {
         $product->load([
