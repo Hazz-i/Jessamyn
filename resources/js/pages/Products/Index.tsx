@@ -75,88 +75,6 @@ export default function Product() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product" />
 
-            {/* Add Product Modal */}
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-                        <h2 className="mb-4 text-lg font-bold">Add Product</h2>
-                        <form onSubmit={handleSubmit} className="grid gap-3">
-                            <input
-                                type="text"
-                                placeholder="Name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                className="rounded border px-3 py-2"
-                            />
-                            {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
-
-                            <textarea
-                                placeholder="Description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                className="rounded border px-3 py-2"
-                            />
-                            {errors.description && <span className="text-xs text-red-500">{errors.description}</span>}
-
-                            <input
-                                type="number"
-                                placeholder="Price"
-                                value={data.price}
-                                onChange={(e) => setData('price', e.target.value)}
-                                className="rounded border px-3 py-2"
-                            />
-                            {errors.price && <span className="text-xs text-red-500">{errors.price}</span>}
-
-                            <input
-                                type="number"
-                                placeholder="Stock"
-                                value={data.stock}
-                                onChange={(e) => setData('stock', e.target.value)}
-                                className="rounded border px-3 py-2"
-                            />
-                            {errors.stock && <span className="text-xs text-red-500">{errors.stock}</span>}
-
-                            <label className="flex items-center gap-2">
-                                <input type="checkbox" checked={data.status} onChange={(e) => setData('status', e.target.checked)} />
-                                Active
-                            </label>
-
-                            {/* Image upload field with button and file name display */}
-                            <div>
-                                <label
-                                    htmlFor="image-upload"
-                                    className="inline-flex cursor-pointer items-center rounded bg-primary px-4 py-2 text-white"
-                                >
-                                    <i className="bx bx-upload mr-2"></i>
-                                    {data.image ? 'Change Image' : 'Upload Image'}
-                                </label>
-                                <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                                {data.image && (
-                                    <span className="mt-2 block text-sm text-gray-700">
-                                        Selected file: {typeof data.image === 'string' ? data.image : data.image.name}
-                                    </span>
-                                )}
-                                {errors.image && <span className="text-xs text-red-500">{errors.image}</span>}
-                            </div>
-
-                            <div className="mt-2 flex justify-end gap-2">
-                                <button
-                                    type="button"
-                                    className="rounded bg-gray-200 px-4 py-2"
-                                    onClick={() => setShowModal(false)}
-                                    disabled={processing}
-                                >
-                                    Cancel
-                                </button>
-                                <button type="submit" className="rounded bg-primary px-4 py-2 text-white" disabled={processing}>
-                                    {processing ? 'Saving...' : 'Save'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Toaster position="top-right" reverseOrder={false} />
                 {/* Product Summary */}
@@ -234,7 +152,7 @@ export default function Product() {
 
                         <div className="me-1 flex items-center justify-center gap-2">
                             <p className="text-sm font-semibold text-primary">Add Product</p>
-                            <CreateProduct open={open} setOpen={setOpen} onSuccess={(msg) => toast.success(msg ?? 'Product berhasil ditambahkan')} />
+                            <CreateProduct open={open} setOpen={setOpen} onSuccess={(msg) => toast.success(msg ?? 'New Product Created')} />
                         </div>
                     </span>
 
