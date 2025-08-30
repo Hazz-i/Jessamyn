@@ -3,7 +3,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 
 // Modal + Form state for creating product
 type ProductForm = {
@@ -18,7 +18,16 @@ type CreateProductProps = {
     open: boolean;
 };
 
+const ALL_VARIANT_OPTIONS = ['25ml', '60ml', '100ml', '120ml', '250ml'];
+
 export default function CreateProductVariant({ productId, setOpen, open }: CreateProductProps) {
+    const { product } = usePage().props as any;
+    // Get existing variant names
+    const existingVariants = product?.variants?.map((v: any) => v.variant) ?? [];
+
+    // Filter out already created variants
+    const availableOptions = ALL_VARIANT_OPTIONS.filter(opt => !existingVariants.includes(opt));
+
     const { data, setData, post, processing, errors, reset, clearErrors, transform } = useForm<ProductForm>({
         variant: '',
         price: 0,
@@ -67,21 +76,18 @@ export default function CreateProductVariant({ productId, setOpen, open }: Creat
                 <form onSubmit={handleSubmit} encType="multipart/form-data" className="grid gap-4 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="variant">Variant</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button type="button" variant="outline" className="justify-between">
-                                    {data.variant ? data.variant : 'Select Variant'}
-                                    <i className="bx bx-chevron-down ml-2" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="min-w-[12rem]">
-                                <DropdownMenuItem onClick={() => setData('variant', '25ml')}>25ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '60ml')}>60ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '100ml')}>100ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '120ml')}>120ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '250ml')}>250ml</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <select
+                            name="variant"
+                            value={data.variant}
+                            onChange={handleInput}
+                            required
+                            className="border rounded px-3 py-2"
+                        >
+                            <option value="">Select Variant</option>
+                            {availableOptions.map(opt => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
                         {errors.variant && <p className="text-sm text-destructive">{errors.variant}</p>}
                     </div>
 
