@@ -2,8 +2,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import CreateProduct from './Create';
+
+import toast, { Toaster } from 'react-hot-toast';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,18 +16,33 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Product() {
-    const { products } = usePage().props;
+    const { products, openVariantModal, productForVariant } = usePage().props as any;
 
     // Normalize products to a simple array for rendering (handles paginator objects)
     const productArray: any[] = Array.isArray(products) ? products : ((products as any)?.data ?? []);
     const totalProducts: number = Array.isArray(products) ? products.length : Number((products as any)?.total ?? 0);
+    const totalBundles: number = productArray.filter((p) => p.category === 'bundle').length;
+    const totalStocks: number = productArray.reduce((sum, p) => sum + (Number(p.stock) || 0), 0);
+
     const currentPage: number = Number((products as any)?.current_page ?? 1);
     const lastPage: number = Number((products as any)?.last_page ?? 1);
     const basePath: string = (products as any)?.path ?? '';
     const prevUrl: string | null = (products as any)?.prev_page_url ?? null;
     const nextUrl: string | null = (products as any)?.next_page_url ?? null;
 
-    // Build compact page list like: 1 2 ... (curr-1) curr (curr+1) ... (last-1) last
+    const [open, setOpen] = useState(false);
+    const [variantOpen, setVariantOpen] = useState(false);
+    const [variantProduct, setVariantProduct] = useState<{ id: number; name: string } | null>(null);
+
+    useEffect(() => {
+        if (openVariantModal && productForVariant) {
+            setVariantProduct(productForVariant);
+            setVariantOpen(true);
+        }
+    }, [openVariantModal, productForVariant]);
+
+    // component-level toasts handle errors; no global pageErrors toast to avoid duplicates
+
     const getPageItems = (current: number, last: number): Array<number | '...'> => {
         const items: Array<number | '...'> = [];
         if (last <= 7) {
@@ -47,45 +65,10 @@ export default function Product() {
         return items;
     };
 
-    // Modal state
-    const [showModal, setShowModal] = useState(false);
-
-    // Form state
-    const { data, setData, post, processing, reset, errors } = useForm({
-        name: '',
-        description: '',
-        price: '',
-        stock: '',
-        status: true,
-        image: null, // Add image field
-    });
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setData('image', e.target.files?.[0] ?? null);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Use FormData for file upload
-        const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('description', data.description);
-        formData.append('price', data.price);
-        formData.append('stock', data.stock);
-        formData.append('status', data.status ? '1' : '0');
-        if (data.image) {
-            formData.append('image', data.image);
-        }
-
-        post(route('product.store'), {
-            data: formData,
-            onSuccess: () => {
-                setShowModal(false);
-                reset();
-            },
-            forceFormData: true,
-        });
+    const truncate = (str: string, max = 120) => {
+        if (typeof str !== 'string') return '';
+        const s = str.trim();
+        return s.length > max ? s.slice(0, max) + '…' : s;
     };
 
     return (
@@ -175,6 +158,7 @@ export default function Product() {
             )}
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Toaster position="top-right" reverseOrder={false} />
                 {/* Product Summary */}
                 <span className="grid gap-2">
                     <div className="grid gap-1">
@@ -183,7 +167,7 @@ export default function Product() {
                     </div>
 
                     {/* Summary */}
-                    <div className="flex items-center justify-center gap-[10rem] py-10">
+                    <div className="flex flex-col items-start gap-5 py-10 md:flex-row md:items-center md:justify-center md:gap-[10rem]">
                         <span className="flex gap-2">
                             <div className="flex items-center justify-center rounded-lg border px-4">
                                 <i className="bx bx-user text-lg" />
@@ -191,10 +175,14 @@ export default function Product() {
 
                             <div className="grid">
                                 <p className="text-sm font-bold text-[#B5B5B5]">Total Products</p>
-                                <span className="flex items-end gap-1">
-                                    <span className="text-lg font-medium">{totalProducts}</span>
-                                    <p className="mb-1 text-sm font-semibold">Products</p>
-                                </span>
+                                {totalProducts > 0 ? (
+                                    <span className="flex items-end gap-1">
+                                        <span className="text-lg font-medium">{totalProducts}</span>
+                                        <p className="mb-1 text-sm font-semibold">Products</p>
+                                    </span>
+                                ) : (
+                                    <span className="text-gray-400">No products</span>
+                                )}
                             </div>
                         </span>
 
@@ -205,24 +193,32 @@ export default function Product() {
 
                             <div className="grid">
                                 <p className="text-sm font-bold text-[#B5B5B5]">Total Bundles</p>
-                                <span className="flex items-end gap-1">
-                                    <span className="text-lg font-medium">100</span>
-                                    <p className="mb-1 text-sm font-semibold">Products</p>
-                                </span>
+                                {totalBundles > 0 ? (
+                                    <span className="flex items-end gap-1">
+                                        <span className="text-lg font-medium">{totalBundles}</span>
+                                        <p className="mb-1 text-sm font-semibold">Bundles</p>
+                                    </span>
+                                ) : (
+                                    <span className="text-gray-400">No bundles</span>
+                                )}
                             </div>
                         </span>
 
                         <span className="flex gap-2">
-                            <div className="flex items-center justify-center rounded-lg bg-primary px-4">
+                            <div className="flex items-center justify-center rounded-lg border px-4">
                                 <i className="bx bx-user text-lg text-primary-foreground" />
                             </div>
 
                             <div className="grid">
                                 <p className="text-sm font-bold text-[#B5B5B5]">Total Stocks</p>
-                                <span className="flex items-end gap-1">
-                                    <span className="text-lg font-medium">100</span>
-                                    <p className="mb-1 text-sm font-semibold text-primary-foreground">Stocks</p>
-                                </span>
+                                {totalStocks > 0 ? (
+                                    <span className="flex items-end gap-1">
+                                        <span className="text-lg font-medium">{totalStocks}</span>
+                                        <p className="mb-1 text-sm font-semibold text-primary-foreground">Stocks</p>
+                                    </span>
+                                ) : (
+                                    <span className="text-gray-400">No stocks</span>
+                                )}
                             </div>
                         </span>
                     </div>
@@ -238,12 +234,7 @@ export default function Product() {
 
                         <div className="me-1 flex items-center justify-center gap-2">
                             <p className="text-sm font-semibold text-primary">Add Product</p>
-                            <button
-                                className="flex cursor-pointer items-center justify-center rounded-lg bg-primary p-2"
-                                onClick={() => setShowModal(true)}
-                            >
-                                <i className="bx bx-plus text-xl text-white" />
-                            </button>
+                            <CreateProduct open={open} setOpen={setOpen} onSuccess={(msg) => toast.success(msg ?? 'Product berhasil ditambahkan')} />
                         </div>
                     </span>
 
@@ -255,48 +246,72 @@ export default function Product() {
                                     <TableHead>
                                         <Checkbox />
                                     </TableHead>
-                                    <TableHead className="w-[100px] text-center">Product Name</TableHead>
+                                    <TableHead className="w-[150px] text-center">Product Name</TableHead>
                                     <TableHead className="text-center">Description</TableHead>
-                                    <TableHead className="text-center">Price</TableHead>
+                                    <TableHead className="text-center">Category</TableHead>
                                     <TableHead className="text-center">Stock</TableHead>
-                                    <TableHead className="text-center">Status</TableHead>
+                                    <TableHead className="text-center">Price</TableHead>
                                     <TableHead className="w-[100px] text-center"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {productArray.length > 0 ? (
-                                    productArray.map((p: any) => (
-                                        <TableRow key={p.id}>
+                                    productArray.map((product: any) => (
+                                        <TableRow key={product.id}>
                                             <TableCell>
                                                 <Checkbox />
                                             </TableCell>
-                                            <TableCell className="flex items-center gap-2 text-center font-medium">
+                                            <TableCell className="flex items-center gap-5 text-center font-medium">
                                                 <span className="h-10 w-10 overflow-hidden rounded-sm">
-                                                    <img
-                                                        src={p.image ? `/storage/${p.image.replace(/^public\//, '')}` : '/default-image.png'}
-                                                        alt={p.name}
-                                                        className="h-full w-full object-cover"
-                                                    />
+                                                    <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
                                                 </span>
-                                                {p.name}
+                                                <p className="text-primary">{product.name}</p>
                                             </TableCell>
-                                            <TableCell className="text-center">{p.description}</TableCell>
-                                            <TableCell className="text-center">Rp. {Number(p.price).toLocaleString('id-ID')}</TableCell>
-                                            <TableCell className="text-center">{p.stock} Available</TableCell>
                                             <TableCell className="text-center">
-                                                <span
-                                                    className={`rounded-sm px-3 py-2 font-medium ${p.status ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500'}`}
-                                                >
-                                                    {p.status ? 'Active' : 'Inactive'}
-                                                </span>
+                                                {product.description ? (
+                                                    <span
+                                                        className="inline-block max-w-[40ch] overflow-hidden align-middle text-ellipsis whitespace-nowrap"
+                                                        title={product.description}
+                                                    >
+                                                        {truncate(String(product.description), 120)}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400">No description</span>
+                                                )}
                                             </TableCell>
-                                            <TableCell className="items-center space-x-5">
-                                                <button className="cursor-pointer text-sm text-primary">
-                                                    <i className="bx bx-edit text-xl"></i>
-                                                </button>
-                                                <button className="cursor-pointer text-sm text-destructive">
-                                                    <i className="bx bx-trash text-xl"></i>
-                                                </button>
+                                            <TableCell className="text-center">
+                                                {product.category ? (
+                                                    <div className="flex flex-wrap justify-center gap-2">
+                                                        <span className="text-muted-foreground">{product.category}</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">Category Not Found</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {product.stock != null ? (
+                                                    <div className="flex flex-wrap justify-center gap-2">
+                                                        <span className="rounded bg-accent px-2 py-1 text-xs">{`${product.stock} Available`}</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">Stock Not Found</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {product.price != null ? (
+                                                    <div className="flex flex-wrap justify-center gap-2">
+                                                        <span className="rounded bg-accent px-2 py-1 text-xs">
+                                                            {`Rp ${Number(product.price).toLocaleString('id-ID')}`}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">Rp. 0;</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <Link href={route('product.show', product.id)} className="text-lg text-primary">
+                                                    <i className="bx bx-file"></i>
+                                                </Link>
                                             </TableCell>
                                         </TableRow>
                                     ))

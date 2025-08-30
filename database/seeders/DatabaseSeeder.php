@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Product;
+use App\Models\ProductVariant;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,5 +23,6 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('jessamyn123_'),
             'role' => 'admin',
         ]);
+
     }
 }

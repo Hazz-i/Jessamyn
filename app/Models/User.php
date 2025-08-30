@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Accounting::class);
     }
+
+    public function productVariants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
 }

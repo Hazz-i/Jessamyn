@@ -7,6 +7,7 @@ use App\Http\Controllers\AccountController;
 use App\Models\Product;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariantController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -18,29 +19,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
 
-    // Route::prefix('dashboard')->group(function () {
-    //     Route::get('products', function () {
-    //         return Inertia::render('Dashboard/Products/Index');
-    //     })->name('dashboard.products.index');
-
-    //     Route::get('products/create', function () {
-    //         return Inertia::render('Dashboard/Products/Create');
-    //     })->name('dashboard.products.create');
-
-    //     Route::post('products', [\App\Http\Controllers\ProductController::class, 'store'])
-    //         ->name('dashboard.products.store');
-    // });
-
-    // Dashboard - Route
-    // Route::get('product', function () {
-    //     return Inertia::render('Products/Index');
-    // })->name('products.index');
-
     Route::resource('product', ProductController::class);
+    // Nested resource for product variants
+    Route::resource('product.variants', ProductVariantController::class)->only(['store', 'update', 'destroy']);
+    
+    Route::resource('accounts', AccountController::class);
 
-    Route::get('accounts', function () {
-        return Inertia::render('Accounts/Index');
-    })->name('accounts.index');
     Route::get('transactions', function () {
         return Inertia::render('Transactions/Index');
     })->name('transactions.index');

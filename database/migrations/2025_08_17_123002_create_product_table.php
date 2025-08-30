@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
-            $table->decimal('price', 10, 2);
-            $table->string('image')->nullable();
+            $table->string('image');
+            $table->string('sub_image');
+            $table->enum('category', ['Bundle', 'Single'])->nullable();
             $table->string('description')->nullable();
+            $table->decimal('price', 10, 2)->default(50000);
             $table->integer('stock')->default(0);
-            $table->boolean('status')->default(true);
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');   
         });

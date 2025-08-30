@@ -1,7 +1,8 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -11,6 +12,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function JurnalUmum() {
+    const { data } = usePage<any>().props;
+
+    const dataArray = data || [];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Jurnal Umum" />
@@ -30,8 +35,56 @@ export default function JurnalUmum() {
                     <h1 className="text-xl font-medium">Jurnal Umum Details</h1>
 
                     {/* Table */}
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>
+                                        <Checkbox />
+                                    </TableHead>
+                                    <TableHead className="w-[100px] text-center">Description</TableHead>
+                                    <TableHead className="text-center">Account</TableHead>
+                                    <TableHead className="text-center">Debits</TableHead>
+                                    <TableHead className="text-center">Credits</TableHead>
+                                    <TableHead className="text-center">Date</TableHead>
+                                    <TableHead className="w-[100px] text-center"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {dataArray.length > 0 ? (
+                                    dataArray.map((p: any) => (
+                                        <TableRow key={p.id}>
+                                            <TableCell className="py-4">
+                                                <Checkbox />
+                                            </TableCell>
+                                            <TableCell className="text-center font-medium">{p.description}</TableCell>
+                                            <TableCell className="text-center">
+                                                {p.account ? <span>{p.account}</span> : <span className="text-gray-400">No account</span>}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {p.debits ? <span>{p.debits}</span> : <span className="text-gray-400">-</span>}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {p.credits ? <span>{p.credits}</span> : <span className="text-gray-400">-</span>}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {p.date ? <span>{p.date}</span> : <span className="text-gray-400">No date</span>}
+                                            </TableCell>
+                                            <TableCell className="items-center space-x-5">
+                                                {/* <EditProduct product={p} /> */}
+                                                {/* <DeleteProduct id={p.id} name={p.name} /> */}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center text-gray-400">
+                                            No Account Available.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 </span>
             </div>
