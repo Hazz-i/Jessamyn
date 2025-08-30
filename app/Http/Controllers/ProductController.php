@@ -41,10 +41,9 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'image' => 'image|mimes:jpg,jpeg,png,webp,avif|max:2048',
             'sub_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,avif|max:2048',
-            'category' => 'in:Bundle,Single',
             'description' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'stock' => 'nullable|numeric',
+            'is_active' => 'boolean',
+            'category' => 'nullable|string|in:Bundle,Single',
         ]);
 
         $path = null;
@@ -59,13 +58,11 @@ class ProductController extends Controller
         try {
             $product = Product::create([
                 'name' => $product_validated['name'],
-                // DB columns `image` and `sub_image` are non-nullable in migration, so use empty string when missing
                 'image' => $path ? '/storage/' . $path : '',
                 'sub_image' => $subPath ? '/storage/' . $subPath : '',
-                'category' => $product_validated['category'] ?? null,
                 'description' => $product_validated['description'] ?? null,
-                'price' => $product_validated['price'] ?? null,
-                'stock' => $product_validated['stock'] ?? null,
+                'category' => $product_validated['category'] ?? null,
+                'is_active' => false,
                 'user_id' => auth()->id(),
             ]);
 
@@ -74,6 +71,10 @@ class ProductController extends Controller
                 ->with('success', 'Product created. Please add at least one variant.');
         } catch (\Throwable $e) {
             report($e);
+            // In local/dev, surface the exact error to help diagnose
+            if (app()->environment('local')) {
+                return back()->withErrors(['general' => $e->getMessage()])->withInput();
+            }
             return back()->withErrors(['general' => 'Failed to save product'])->withInput();
         }
     }
@@ -93,20 +94,18 @@ class ProductController extends Controller
             'name' => $product->name,
             'image' => $product->image,
             'sub_image' => $product->sub_image,
-            'category' => $product->category,
             'description' => $product->description,
-            'price' => $product->price,
-            'stock' => $product->stock,
+            'category' => $product->category,
             'user' => $product->relationLoaded('user') && $product->user ? [
                 'id' => $product->user->id,
                 'name' => $product->user->name,
             ] : null,
-            'variants' => $product->relationLoaded('productVariants') ? $product->productVariants->map(function ($v) {
+            'variants' => $product->relationLoaded('productVariants') ? $product->productVariants->map(function ($variant) {
                 return [
-                    'id' => $v->id,
-                    'variant' => $v->variant,
-                    'price' => $v->price,
-                    'stock_qty' => $v->stock_qty,
+                    'id' => $variant->id,
+                    'variant' => $variant->variant,
+                    'price' => $variant->price,
+                    'stock_qty' => $variant->stock_qty,
                 ];
             }) : [],
         ];
@@ -131,12 +130,9 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'price' => 'sometimes|required|numeric|min:0',
             'image' => 'sometimes|image|mimes:jpg,jpeg,png,webp,avif|max:2048',
             'sub_image' => 'sometimes|image|mimes:jpg,jpeg,png,webp,avif|max:2048',
-            'category' => 'sometimes|nullable|in:Bundle,Single',
             'description' => 'sometimes|nullable|string',
-            'stock' => 'sometimes|required|numeric|min:0',
         ]);
 
         if ($request->hasFile('image')) {

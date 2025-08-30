@@ -18,9 +18,8 @@ return new class extends Migration
             $table->string('image');
             $table->string('sub_image');
             $table->enum('category', ['Bundle', 'Single'])->nullable();
-            $table->string('description')->nullable();
-            $table->decimal('price', 10, 2)->default(50000);
-            $table->integer('stock')->default(0);
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(false);
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');   
         });

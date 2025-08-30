@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('product_variant', function (Blueprint $table) {
             $table->id();
-            $table->enum('variant', ['25ml' ,'60ml', '100ml', '120ml', '250ml']);
+            $table->enum('variant', ['25ml' ,'60ml', '100ml', '120ml', '250ml', '60ml-25ml-100ml']);
             $table->decimal('price', 10, 2); 
             $table->integer('stock_qty')->default(0);
             $table->timestamps();

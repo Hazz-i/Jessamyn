@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@inertiajs/react';
@@ -10,22 +9,16 @@ import DeleteProduct from './Delete';
 type Product = {
     id: number | string;
     name: string;
-    price: number | string;
     image?: string | null;
     sub_image?: string | null;
-    category?: string | null;
     description?: string | null;
-    stock: number | string;
 };
 
 type ProductForm = {
     name: string;
     image: File | null;
     sub_image: File | null;
-    category: string;
     description: string;
-    stock: string;
-    price: string;
 };
 
 export default function EditProduct({ product }: { product: Product }) {
@@ -35,10 +28,7 @@ export default function EditProduct({ product }: { product: Product }) {
         name: String(product.name ?? ''),
         image: null,
         sub_image: null,
-        category: String(product.category ?? ''),
         description: String(product.description ?? ''),
-        stock: String(product.stock ?? ''),
-        price: String(product.price ?? ''),
     });
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -77,16 +67,6 @@ export default function EditProduct({ product }: { product: Product }) {
         e.preventDefault();
         transform((d) => ({
             ...d,
-            price: Number(d.price) as unknown as string,
-            stock: Number(d.stock) as unknown as string,
-            // Normalize to capitalized tokens expected by backend
-            category: d.category
-                ? ['bundle', 'single'].includes(String(d.category).toLowerCase())
-                    ? String(d.category).toLowerCase() === 'bundle'
-                        ? ('Bundle' as unknown as string)
-                        : ('Single' as unknown as string)
-                    : (d.category as unknown as string)
-                : (null as unknown as string),
         }));
         put(route('product.update', product.id), {
             forceFormData: true,
@@ -229,23 +209,6 @@ export default function EditProduct({ product }: { product: Product }) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor={`category-${product.id}`}>Category</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button type="button" variant="outline" className="justify-between border-input">
-                                    {data.category ? data.category : 'Select category'}
-                                    <i className="bx bx-chevron-down ml-2" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-full min-w-[12rem]">
-                                <DropdownMenuItem onClick={() => setData('category', 'Single')}>Single</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('category', 'Bundle')}>Bundle</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
-                    </div>
-
-                    <div className="grid gap-2">
                         <Label htmlFor={`description-${product.id}`}>Description</Label>
                         <textarea
                             id={`description-${product.id}`}
@@ -255,20 +218,6 @@ export default function EditProduct({ product }: { product: Product }) {
                             className="min-h-[100px] rounded-md border p-3 text-sm"
                         />
                         {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
-                    </div>
-
-                    {/* Price & Stock (responsive grid) */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor={`stock-${product.id}`}>Stock</Label>
-                            <Input id={`stock-${product.id}`} name="stock" type="number" value={data.stock} onChange={handleInput} required />
-                            {errors.stock && <p className="text-sm text-destructive">{errors.stock}</p>}
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor={`price-${product.id}`}>Price</Label>
-                            <Input id={`price-${product.id}`} name="price" type="number" value={data.price} onChange={handleInput} required />
-                            {errors.price && <p className="text-sm text-destructive">{errors.price}</p>}
-                        </div>
                     </div>
 
                     <DialogFooter>

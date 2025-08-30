@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import CreateProduct from './Create';
 
 import toast, { Toaster } from 'react-hot-toast';
@@ -16,13 +16,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Product() {
-    const { products, openVariantModal, productForVariant } = usePage().props as any;
+    const { products } = usePage().props as any;
 
     // Normalize products to a simple array for rendering (handles paginator objects)
     const productArray: any[] = Array.isArray(products) ? products : ((products as any)?.data ?? []);
+
     const totalProducts: number = Array.isArray(products) ? products.length : Number((products as any)?.total ?? 0);
-    const totalBundles: number = productArray.filter((p) => p.category === 'bundle').length;
-    const totalStocks: number = productArray.reduce((sum, p) => sum + (Number(p.stock) || 0), 0);
+    const totalBundles: number = productArray.filter((p) => p.category === 'Bundle').length;
+    const totalStocks: number = productArray.reduce((sum: number, p: any) => {
+        const variants = Array.isArray(p?.product_variants) ? p.product_variants : [];
+        const productStock = variants.reduce((vSum: number, v: any) => vSum + (Number(v?.stock_qty) || 0), 0);
+        return sum + productStock;
+    }, 0);
 
     const currentPage: number = Number((products as any)?.current_page ?? 1);
     const lastPage: number = Number((products as any)?.last_page ?? 1);
@@ -31,17 +36,6 @@ export default function Product() {
     const nextUrl: string | null = (products as any)?.next_page_url ?? null;
 
     const [open, setOpen] = useState(false);
-    const [variantOpen, setVariantOpen] = useState(false);
-    const [variantProduct, setVariantProduct] = useState<{ id: number; name: string } | null>(null);
-
-    useEffect(() => {
-        if (openVariantModal && productForVariant) {
-            setVariantProduct(productForVariant);
-            setVariantOpen(true);
-        }
-    }, [openVariantModal, productForVariant]);
-
-    // component-level toasts handle errors; no global pageErrors toast to avoid duplicates
 
     const getPageItems = (current: number, last: number): Array<number | '...'> => {
         const items: Array<number | '...'> = [];
@@ -166,9 +160,7 @@ export default function Product() {
                                     </TableHead>
                                     <TableHead className="w-[150px] text-center">Product Name</TableHead>
                                     <TableHead className="text-center">Description</TableHead>
-                                    <TableHead className="text-center">Category</TableHead>
-                                    <TableHead className="text-center">Stock</TableHead>
-                                    <TableHead className="text-center">Price</TableHead>
+                                    <TableHead className="text-center">Status</TableHead>
                                     <TableHead className="w-[100px] text-center"></TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -197,35 +189,23 @@ export default function Product() {
                                                     <span className="text-gray-400">No description</span>
                                                 )}
                                             </TableCell>
+
                                             <TableCell className="text-center">
-                                                {product.category ? (
+                                                {product.is_active ? (
                                                     <div className="flex flex-wrap justify-center gap-2">
-                                                        <span className="text-muted-foreground">{product.category}</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">Category Not Found</span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {product.stock != null ? (
-                                                    <div className="flex flex-wrap justify-center gap-2">
-                                                        <span className="rounded bg-accent px-2 py-1 text-xs">{`${product.stock} Available`}</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">Stock Not Found</span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {product.price != null ? (
-                                                    <div className="flex flex-wrap justify-center gap-2">
-                                                        <span className="rounded bg-accent px-2 py-1 text-xs">
-                                                            {`Rp ${Number(product.price).toLocaleString('id-ID')}`}
+                                                        <span className="rounded bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">
+                                                            Active
                                                         </span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-xs text-muted-foreground">Rp. 0;</span>
+                                                    <div className="flex flex-wrap justify-center gap-2">
+                                                        <span className="rounded bg-destructive px-2 py-1 text-xs font-semibold text-white">
+                                                            Inactive
+                                                        </span>
+                                                    </div>
                                                 )}
                                             </TableCell>
+
                                             <TableCell className="text-center">
                                                 <Link href={route('product.show', product.id)} className="text-lg text-primary">
                                                     <i className="bx bx-file"></i>

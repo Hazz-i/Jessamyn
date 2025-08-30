@@ -10,20 +10,25 @@ type ProductForm = {
     variant: string;
     stock_qty: number;
     price: number;
+    category: string;
 };
 
 type CreateProductProps = {
-    productId: number | string;
+    product: any;
     setOpen: (open: boolean) => void;
     open: boolean;
 };
 
-export default function CreateProductVariant({ productId, setOpen, open }: CreateProductProps) {
+export default function CreateProductVariant({ product, setOpen, open }: CreateProductProps) {
     const { data, setData, post, processing, errors, reset, clearErrors, transform } = useForm<ProductForm>({
         variant: '',
+        category: '',
         price: 0,
         stock_qty: 0,
     });
+
+    // Determine which category to use for UI logic: prefer product.category, fallback to selected form category
+    const effectiveCategory = (product?.category ?? data.category ?? '').toString().toLowerCase();
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -34,12 +39,13 @@ export default function CreateProductVariant({ productId, setOpen, open }: Creat
         e.preventDefault();
         transform((d) => ({
             ...d,
+            // Use the product category if it exists, otherwise send the selected category from the form
+            category: product?.category ?? d.category,
         }));
-        post(route('product.variants.store', productId), {
+        post(route('product.variants.store', product.id), {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                // Let Inertia redirect to variant form; modal close optional
                 setOpen(false);
                 reset();
                 clearErrors();
@@ -65,6 +71,25 @@ export default function CreateProductVariant({ productId, setOpen, open }: Creat
                 <DialogTitle>Create Product Variant</DialogTitle>
                 <DialogDescription>Fill in the product variants below.</DialogDescription>
                 <form onSubmit={handleSubmit} encType="multipart/form-data" className="grid gap-4 py-2">
+                    {product.category == null && (
+                        <div className="grid gap-2">
+                            <Label htmlFor="variant">Category</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button type="button" variant="outline" className="justify-between border-input">
+                                        {data.category ? data.category : 'Select category'}
+                                        <i className="bx bx-chevron-down ml-2" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-full min-w-[12rem]">
+                                    <DropdownMenuItem onClick={() => setData('category', 'Single')}>Single</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setData('category', 'Bundle')}>Bundle</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
+                        </div>
+                    )}
+
                     <div className="grid gap-2">
                         <Label htmlFor="variant">Variant</Label>
                         <DropdownMenu>
@@ -75,11 +100,17 @@ export default function CreateProductVariant({ productId, setOpen, open }: Creat
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start" className="min-w-[12rem]">
-                                <DropdownMenuItem onClick={() => setData('variant', '25ml')}>25ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '60ml')}>60ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '100ml')}>100ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '120ml')}>120ml</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', '250ml')}>250ml</DropdownMenuItem>
+                                {effectiveCategory === 'bundle' ? (
+                                    <DropdownMenuItem onClick={() => setData('variant', '60ml-25ml-100ml')}>60ml-25ml-100ml</DropdownMenuItem>
+                                ) : (
+                                    <>
+                                        <DropdownMenuItem onClick={() => setData('variant', '25ml')}>25ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '60ml')}>60ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '100ml')}>100ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '120ml')}>120ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '250ml')}>250ml</DropdownMenuItem>
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                         {errors.variant && <p className="text-sm text-destructive">{errors.variant}</p>}

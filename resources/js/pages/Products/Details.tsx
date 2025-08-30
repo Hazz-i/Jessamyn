@@ -14,8 +14,6 @@ export default function ProductDetails() {
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
 
-    // console.log('Product details page product:', product);
-
     const breadcrumbs: BreadcrumbItem[] = useMemo(
         () => [
             {
@@ -125,9 +123,9 @@ export default function ProductDetails() {
                     </div>
 
                     {/* Info */}
-                    <div className="flex flex-col gap-10 justify-between">
+                    <div className="flex flex-col justify-between gap-10">
                         <span className="flex gap-2">
-                            <h1 className="text-2xl md:text-5xl font-semibold">{product?.name}</h1>
+                            <h1 className="text-2xl font-semibold md:text-5xl">{product?.name}</h1>
                             <EditProduct product={product} />
                         </span>
 
@@ -154,7 +152,7 @@ export default function ProductDetails() {
                                     <h2 className="text-lg font-semibold">Variants</h2>
 
                                     <div className="flex items-center gap-2">
-                                        <CreateProductVariant productId={product.id} setOpen={setOpen} open={open} />
+                                        <CreateProductVariant product={product} setOpen={setOpen} open={open} />
 
                                         {product?.variants && product.variants.length > 0 && (
                                             <DropdownMenu>

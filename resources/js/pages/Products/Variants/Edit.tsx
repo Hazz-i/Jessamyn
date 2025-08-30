@@ -8,16 +8,18 @@ import { useState } from 'react';
 import DeleteProductVariant from './Delete';
 
 type Variant = {
-    id: number | string;
+    id: number;
     variant: string;
-    price: number | string;
-    stock_qty: number | string;
-    product_id?: number | string;
+    price: number;
+    stock_qty: number;
+    category?: string;
+    product_id?: number;
 };
 
 type VariantForm = {
     variant: string;
     stock_qty: number;
+    category: string;
     price: number;
 };
 
@@ -42,6 +44,7 @@ export default function EditProductVariant({
         variant: String(variant.variant ?? ''),
         price: Number(variant.price ?? 0),
         stock_qty: Number(variant.stock_qty ?? 0),
+        category: String(variant.category ?? ''),
     });
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -75,7 +78,7 @@ export default function EditProductVariant({
                 }
             }}
         >
-            {withTrigger && (
+            {withTrigger && (   
                 <DialogTrigger asChild>
                     <button className="cursor-pointer text-sm text-primary" aria-label="Edit variant">
                         <i className="bx bx-edit text-xl"></i>
@@ -96,8 +99,17 @@ export default function EditProductVariant({
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start" className="min-w-[12rem]">
-                                <DropdownMenuItem onClick={() => setData('variant', 'Single')}>Single</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('variant', 'Bundling')}>Bundling</DropdownMenuItem>
+                                {data.category == 'Bundle' ? (
+                                    <DropdownMenuItem onClick={() => setData('variant', '60ml-25ml-100ml')}>60ml-25ml-100ml</DropdownMenuItem>
+                                ) : (
+                                    <>
+                                        <DropdownMenuItem onClick={() => setData('variant', '25ml')}>25ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '60ml')}>60ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '100ml')}>100ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '120ml')}>120ml</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setData('variant', '250ml')}>250ml</DropdownMenuItem>
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                         {errors.variant && <p className="text-sm text-destructive">{errors.variant}</p>}

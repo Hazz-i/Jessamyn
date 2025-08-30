@@ -16,7 +16,8 @@ class ProductVariantController extends Controller
     public function store(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'variant' => 'required|string|in:25ml,60ml,100ml,120ml,250ml',
+            'variant' => 'required|string|in:25ml,60ml,100ml,120ml,250ml,60ml-25ml-100ml',
+            'category' => 'in:Bundle,Single',
             'price' => 'required|numeric|min:0',
             'stock_qty' => 'required|integer|min:0',
         ]);
@@ -25,6 +26,12 @@ class ProductVariantController extends Controller
             'variant' => $validated['variant'],
             'price' => $validated['price'],
             'stock_qty' => $validated['stock_qty'],
+        ]);
+
+        // Mark this product as active once it has at least one variant
+        $product->update([
+            'is_active' => true,
+            'category' => $validated['category'],
         ]);
 
         $variant->product()->associate($product);
@@ -44,12 +51,16 @@ class ProductVariantController extends Controller
         }
 
         $validated = $request->validate([
-            'variant' => 'required|string|in:25ml,60ml,100ml,120ml,250ml',
+            'variant' => 'required|string|in:25ml,60ml,100ml,120ml,250ml,60ml-25ml-100ml',
             'price' => 'required|numeric|min:0',
             'stock_qty' => 'required|integer|min:0',
         ]);
 
-        $variant->update($validated);
+        $variant->update([
+            'variant' => $validated['variant'],
+            'price' => $validated['price'],
+            'stock_qty' => $validated['stock_qty'],
+        ]);
 
         return redirect()->route('product.show', $product->id)->with('success', 'Variant updated successfully.');
     }

@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,8 +14,6 @@ type ProductForm = {
     sub_image: File | null;
     category: string;
     description: string;
-    stock: number;
-    price: number;
 };
 
 type CreateProductProps = {
@@ -32,8 +29,6 @@ export default function CreateProduct({ setOpen, open, onSuccess }: CreateProduc
         sub_image: null,
         category: '',
         description: '',
-        price: 0,
-        stock: 0,
     });
 
     // Image previews + refs
@@ -84,11 +79,9 @@ export default function CreateProduct({ setOpen, open, onSuccess }: CreateProduc
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                // Let Inertia redirect to variant form; modal close optional
                 setOpen(false);
                 reset();
                 clearErrors();
-                // Notify parent for toast
                 onSuccess?.('Product successfully added');
             },
             onError: (errs) => {
@@ -101,7 +94,6 @@ export default function CreateProduct({ setOpen, open, onSuccess }: CreateProduc
                     }
                 });
                 if (messages.length === 0) messages.push('Failed to save product');
-                // Show all errors via toast
                 messages.forEach((m) => toast.error(m));
             },
         });
@@ -224,23 +216,6 @@ export default function CreateProduct({ setOpen, open, onSuccess }: CreateProduc
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="variant">Category</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button type="button" variant="outline" className="justify-between border-input">
-                                    {data.category ? data.category : 'Select category'}
-                                    <i className="bx bx-chevron-down ml-2" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-full min-w-[12rem]">
-                                <DropdownMenuItem onClick={() => setData('category', 'Single')}>Single</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setData('category', 'Bundle')}>Bundle</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
-                    </div>
-
-                    <div className="grid gap-2">
                         <Label htmlFor="description">Description</Label>
                         <textarea
                             required
@@ -252,20 +227,6 @@ export default function CreateProduct({ setOpen, open, onSuccess }: CreateProduc
                         />
                         <div className="text-right text-xs text-muted-foreground">{data.description?.length ?? 0} chars</div>
                         {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
-                    </div>
-
-                    {/* Price & Stock (responsive grid) */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="stock">Stock</Label>
-                            <Input id="stock" name="stock" type="number" value={data.stock} onChange={handleInput} required />
-                            {errors.stock && <p className="text-sm text-destructive">{errors.stock}</p>}
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="price">Price</Label>
-                            <Input id="price" name="price" type="number" value={data.price} onChange={handleInput} required />
-                            {errors.price && <p className="text-sm text-destructive">{errors.price}</p>}
-                        </div>
                     </div>
 
                     <DialogFooter className="flex flex-col gap-2 sm:flex-row">

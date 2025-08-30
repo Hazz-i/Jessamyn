@@ -16,8 +16,7 @@ class Product extends Model
         'sub_image',
         'category',
         'description',
-        'price',
-        'stock',
+        'is_active',
         'user_id',
     ];
     public function user()
