@@ -42,7 +42,6 @@ class HomeController extends Controller
             'sub_image' => $product->sub_image,
             'description' => $product->description,
             'category' => $product->category,
-            // user tidak bawa id, hanya name
             'user' => $product->relationLoaded('user') && $product->user ? [
                 'name' => $product->user->name,
             ] : null,
