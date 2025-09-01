@@ -12,6 +12,14 @@ use App\Http\Controllers\ProductVariantController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/all-products', [HomeController::class, 'products'])->name('products');
+// Route::get('/productShow/{id}', function ($id) {
+//     $product = Product::findOrFail($id);
+//     return Inertia::render('Home/ProductDetail', [
+//         'product' => $product
+//     ]);
+// })->name('products.show');\
+Route::get('/productShow/{product}', [HomeController::class, 'showProduct'])->name('products.show');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

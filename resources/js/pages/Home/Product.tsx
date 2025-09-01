@@ -28,7 +28,7 @@ const carouselImages = [
 ];
 
 const Product = () => {
-    const { products } = usePage().props as any;
+    const { products } = usePage().props as { products: Paginator<ProductType> };
     const paginated = products?.data || [];
     const currentPage = products?.current_page || 1;
     const lastPage = products?.last_page || 1;
@@ -50,23 +50,41 @@ const Product = () => {
                 <AppNavbar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
                 {/* Carousel */}
-                <div className="relative w-full overflow-hidden rounded-lg bg-gray-200" style={{ height: 250 }}>
-                    <img src={carouselImages[carouselIndex]} alt="carousel" className="h-full w-full object-cover transition-all duration-500" />
+                <div
+                    className="relative w-full overflow-hidden rounded-lg bg-gray-200"
+                    style={{ height: 250 }}
+                >
+                    <img
+                        src={carouselImages[carouselIndex]}
+                        alt="carousel"
+                        className="h-full w-full object-cover transition-all duration-500"
+                    />
                     <div className="absolute right-0 bottom-4 left-0 flex justify-center gap-2">
                         {carouselImages.map((_, idx) => (
                             <span
                                 key={idx}
-                                className={`inline-block h-2 w-2 rounded-full ${carouselIndex === idx ? 'bg-gray-800' : 'bg-gray-400'}`}
+                                className={`inline-block h-2 w-2 rounded-full ${
+                                    carouselIndex === idx ? 'bg-gray-800' : 'bg-gray-400'
+                                }`}
                             />
                         ))}
                     </div>
                 </div>
 
-                <h2 className="mt-8 text-center text-2xl font-bold text-gray-800">Our Product</h2>
+                <h2 className="mt-8 text-center text-2xl font-bold text-gray-800">
+                    Our Product
+                </h2>
 
+                {/* Product Grid */}
                 <div className="grid grid-cols-1 gap-8 px-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {paginated.map((p: ProductType) => (
-                        <ProductCard key={p.id} product={p} />
+                        <Link
+                            key={p.id}
+                            href={route('products.show', p.id)} // 🔥 Route detail
+                            preserveScroll
+                        >
+                            <ProductCard product={p} />
+                        </Link>
                     ))}
                 </div>
 
@@ -74,7 +92,9 @@ const Product = () => {
                 <div className="mb-8 flex justify-center gap-2">
                     <Link
                         href={products?.prev_page_url || '#'}
-                        className={`rounded border border-gray-300 bg-white px-3 py-1 text-primary-foreground ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`rounded border border-gray-300 bg-white px-3 py-1 text-primary-foreground ${
+                            currentPage === 1 ? 'pointer-events-none opacity-50' : ''
+                        }`}
                         preserveScroll
                     >
                         Previous
@@ -84,7 +104,9 @@ const Product = () => {
                     </span>
                     <Link
                         href={products?.next_page_url || '#'}
-                        className={`rounded border border-gray-300 bg-white px-3 py-1 text-primary-foreground ${currentPage === lastPage ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`rounded border border-gray-300 bg-white px-3 py-1 text-primary-foreground ${
+                            currentPage === lastPage ? 'pointer-events-none opacity-50' : ''
+                        }`}
                         preserveScroll
                     >
                         Next
