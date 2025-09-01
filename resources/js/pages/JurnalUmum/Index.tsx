@@ -3,6 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import CreateJurnalUmum from './Create';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,6 +15,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function JurnalUmum() {
     const { data } = usePage<any>().props;
+    const [open, setOpen] = useState(false);
 
     const dataArray = data || [];
 
@@ -21,7 +24,7 @@ export default function JurnalUmum() {
             <Head title="Jurnal Umum" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* Product Summary */}
+                {/* Jurnal Umum Head */}
                 <span className="grid gap-1">
                     <h1 className="text-xl font-medium">Jurnal Umum</h1>
                     <p className="text-sm text-[#B5B5B5]">
@@ -32,7 +35,17 @@ export default function JurnalUmum() {
 
                 {/* Product List */}
                 <span className="grid gap-2">
-                    <h1 className="text-xl font-medium">Jurnal Umum Details</h1>
+                    <span className="flex items-center justify-between">
+                        <div className="grid gap-1">
+                            <h1 className="text-xl font-medium">Jurnal Umum Detail</h1>
+                            <p className="text-sm text-[#B5B5B5]">Daftar Jurnal Umum</p>
+                        </div>
+
+                        <div className="me-1 flex items-center justify-center gap-2">
+                            <p className="text-sm font-semibold text-primary">Add Record</p>
+                            <CreateJurnalUmum open={open} setOpen={setOpen} />
+                        </div>
+                    </span>
 
                     {/* Table */}
                     <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
@@ -79,7 +92,7 @@ export default function JurnalUmum() {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={7} className="text-center text-gray-400">
-                                            No Account Available.
+                                            No Record Available.
                                         </TableCell>
                                     </TableRow>
                                 )}

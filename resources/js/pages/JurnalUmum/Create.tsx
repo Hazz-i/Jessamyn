@@ -8,20 +8,22 @@ import { useForm } from '@inertiajs/react';
 type AccountForm = {
     name: string;
     description: string;
-    status: string; // '1' | '0'
+    status: string;
+    reff: string;
 };
 
-type CreateAccountProps = {
+type CreateJurnalUmumProps = {
     setOpen: (open: boolean) => void;
     open: boolean;
     // onSuccess: () => void;
 };
 
-export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
+export default function CreateJurnalUmum({ setOpen, open }: CreateJurnalUmumProps) {
     const { data, setData, post, processing, errors, reset, clearErrors, transform } = useForm<AccountForm>({
         name: '',
         description: '',
         status: '1',
+        reff: '',
     });
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -84,13 +86,27 @@ export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
                         {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="status">Status</Label>
-                        <select id="status" name="status" value={data.status} onChange={handleInput} className="h-10 rounded-md border px-3 text-sm">
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                        {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
+                    <div className="flex items-center justify-center gap-2">
+                        <div className="grid flex-1 gap-2">
+                            <Label htmlFor="status">Status</Label>
+                            <select
+                                id="status"
+                                name="status"
+                                value={data.status}
+                                onChange={handleInput}
+                                className="h-10 rounded-md border px-3 text-sm"
+                            >
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                            {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="reff">Account Reff</Label>
+                            <Input id="reff" name="reff" value={data.reff} onChange={handleInput} required />
+                            {errors.reff && <p className="text-sm text-destructive">{errors.reff}</p>}
+                        </div>
                     </div>
 
                     <DialogFooter>
@@ -100,7 +116,7 @@ export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
                             </Button>
                         </DialogClose>
                         <Button type="submit" disabled={processing}>
-                            {processing ? 'Saving...' : 'Save Product'}
+                            {processing ? 'Saving' : 'Save Product'}
                         </Button>
                     </DialogFooter>
                 </form>

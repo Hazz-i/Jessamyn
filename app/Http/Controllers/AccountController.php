@@ -13,7 +13,7 @@ class AccountController extends Controller
      */
     public function index()
     {
-        $accounts = Account::all();
+    $accounts = Account::orderByDesc('id')->paginate(11);
         return Inertia::render('Accounts/Index', [
             'accounts' => $accounts,
             'flash' => [

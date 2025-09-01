@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import CreateAccount from './Create';
@@ -34,7 +34,36 @@ export default function Account() {
     const [open, setOpen] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
 
-    const accountArray: AccountType[] = Array.isArray(accounts) ? accounts : ((accounts as any)?.data ?? []);
+    const paginator: any = accounts as any;
+    const accountArray: AccountType[] = Array.isArray(accounts) ? (accounts as AccountType[]) : (paginator?.data ?? []);
+    const currentPage: number = Array.isArray(accounts) ? 1 : Number(paginator?.current_page ?? 1);
+    const lastPage: number = Array.isArray(accounts) ? 1 : Number(paginator?.last_page ?? 1);
+    const basePath: string = Array.isArray(accounts) ? '/account' : (paginator?.path ?? '/account');
+    const prevUrl: string | null = Array.isArray(accounts) ? null : (paginator?.prev_page_url ?? null);
+    const nextUrl: string | null = Array.isArray(accounts) ? null : (paginator?.next_page_url ?? null);
+    const totalAccounts: number = Array.isArray(accounts) ? accountArray.length : Number(paginator?.total ?? accountArray.length);
+
+    const getPageItems = (current: number, last: number): Array<number | '...'> => {
+        const items: Array<number | '...'> = [];
+        if (last <= 7) {
+            for (let i = 1; i <= last; i++) items.push(i);
+            return items;
+        }
+        items.push(1);
+        if (current > 3) {
+            items.push(2);
+            if (current > 4) items.push('...');
+        }
+        const start = Math.max(3, current - 1);
+        const end = Math.min(last - 2, current + 1);
+        for (let i = start; i <= end; i++) items.push(i);
+        if (current < last - 2) {
+            if (current < last - 3) items.push('...');
+            items.push(last - 1);
+        }
+        items.push(last);
+        return items;
+    };
 
     useEffect(() => {
         if (flash?.success) {
@@ -76,7 +105,10 @@ export default function Account() {
                 <span className="grid gap-2">
                     <span className="flex items-center justify-between">
                         <div className="grid gap-1">
-                            <h1 className="text-xl font-medium">Account List</h1>
+                            <span className="flex items-center gap-2">
+                                <h1 className="text-xl font-medium">Account List</h1>
+                                <small className="text-foreground">({totalAccounts} accounts)</small>
+                            </span>
                             <p className="text-sm text-[#B5B5B5]">Daftar Akun</p>
                         </div>
 
@@ -142,6 +174,69 @@ export default function Account() {
                     </div>
                 </span>
             </div>
+            {/* Pagination */}
+            {lastPage > 1 && (
+                <nav className="mb-3 flex items-center justify-center gap-2" aria-label="Pagination">
+                    {/* Prev */}
+                    {prevUrl ? (
+                        <Link
+                            href={prevUrl}
+                            preserveScroll
+                            preserveState
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-sm hover:bg-accent"
+                            aria-label="Previous page"
+                        >
+                            <i className="bx bx-chevron-left text-lg" />
+                        </Link>
+                    ) : (
+                        <span className="inline-flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-md border text-sm text-muted-foreground/50">
+                            <i className="bx bx-chevron-left text-lg" />
+                        </span>
+                    )}
+
+                    {getPageItems(currentPage, lastPage).map((item, idx) =>
+                        item === '...' ? (
+                            <span
+                                key={`ellipsis-${idx}`}
+                                className="inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2 text-sm text-muted-foreground"
+                            >
+                                ...
+                            </span>
+                        ) : (
+                            <Link
+                                key={item}
+                                href={`${basePath}?page=${item}`}
+                                preserveScroll
+                                preserveState
+                                className={
+                                    `inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-3 text-sm ` +
+                                    (item === currentPage ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent')
+                                }
+                                aria-current={item === currentPage ? 'page' : undefined}
+                            >
+                                {item}
+                            </Link>
+                        ),
+                    )}
+
+                    {/* Next */}
+                    {nextUrl ? (
+                        <Link
+                            href={nextUrl}
+                            preserveScroll
+                            preserveState
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-sm hover:bg-accent"
+                            aria-label="Next page"
+                        >
+                            <i className="bx bx-chevron-right text-lg" />
+                        </Link>
+                    ) : (
+                        <span className="inline-flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-md border text-sm text-muted-foreground/50">
+                            <i className="bx bx-chevron-right text-lg" />
+                        </span>
+                    )}
+                </nav>
+            )}
         </AppLayout>
     );
 }
