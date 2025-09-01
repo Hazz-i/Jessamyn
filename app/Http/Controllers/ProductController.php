@@ -40,8 +40,8 @@ class ProductController extends Controller
         $product_validated = $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'image|mimes:jpg,jpeg,png,webp,avif|max:2048',
-            'sub_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,avif|max:2048',
-            'description' => 'nullable|string',
+            'sub_image' => 'image|mimes:jpg,jpeg,png,webp,avif|max:2048',
+            'description' => 'string',
             'is_active' => 'boolean',
             'category' => 'nullable|string|in:Bundle,Single',
         ]);

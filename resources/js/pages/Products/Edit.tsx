@@ -11,7 +11,7 @@ type Product = {
     name: string;
     image?: string | null;
     sub_image?: string | null;
-    description?: string | null;
+    description?: string;
 };
 
 type ProductForm = {
@@ -69,7 +69,6 @@ export default function EditProduct({ product }: { product: Product }) {
             ...d,
         }));
         put(route('product.update', product.id), {
-            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 setOpen(false);
