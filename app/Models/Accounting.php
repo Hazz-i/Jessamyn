@@ -14,6 +14,7 @@ class Accounting extends Model
         'description',
         'debit',
         'credit',
+        'note',
         'image'
     ];
 

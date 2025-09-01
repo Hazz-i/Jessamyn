@@ -27,11 +27,13 @@ export default function BukuBesar() {
             <div className="flex h-full flex-1 flex-col gap-10 overflow-x-auto rounded-xl p-4">
                 {/* Product Summary */}
                 <span className="grid gap-1">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-medium">Reporting</h1>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h1 className="text-xl font-medium sm:text-2xl">Reporting</h1>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline">{isMonth}</Button>
+                                <Button variant="outline" className="w-full sm:w-auto">
+                                    {isMonth}
+                                </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 {month.map((m) => (
@@ -53,15 +55,15 @@ export default function BukuBesar() {
                 {/* Product List */}
                 <span className="grid gap-5">
                     {/* Content */}
-                    <div className="flex flex-wrap items-center justify-center gap-5">
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
                         {/* Buku Besar */}
-                        <span className="grid flex-1 gap-5">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium">Buku Besar</h2>
+                        <span className="grid gap-5">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <h2 className="text-lg font-medium sm:text-xl">Buku Besar</h2>
 
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="py-1">
+                                        <Button variant="outline" className="w-full py-1 sm:w-auto">
                                             {isAccount}
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -76,25 +78,25 @@ export default function BukuBesar() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
-                            <div className="relative aspect-video flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"></div>
+                            <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"></div>
                         </span>
 
                         {/* Neraca */}
-                        <span className="grid flex-1 gap-5">
+                        <span className="grid gap-5">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium">Neraca {isMonth}</h2>
+                                <h2 className="text-lg font-medium sm:text-xl">Neraca {isMonth}</h2>
                             </div>
-                            <div className="relative aspect-video flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                            <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                                 <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                             </div>
                         </span>
 
                         {/* Laba/Rugi */}
-                        <span className="grid flex-1 gap-5">
+                        <span className="grid gap-5">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium">Laba/Rugi {isMonth}</h2>
+                                <h2 className="text-lg font-medium sm:text-xl">Laba/Rugi {isMonth}</h2>
                             </div>
-                            <div className="relative aspect-video flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                            <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                                 <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                             </div>
                         </span>
@@ -102,7 +104,7 @@ export default function BukuBesar() {
 
                     {/* Kertas Kerja */}
                     <div className="grid gap-5">
-                        <h2 className="text-lg font-medium">{isMonth} Reporting Details</h2>
+                        <h2 className="text-lg font-medium sm:text-xl">{isMonth} Reporting Details</h2>
                         <div className="relative aspect-video flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         </div>

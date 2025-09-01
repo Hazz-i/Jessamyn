@@ -12,7 +12,10 @@ class AccountingController extends Controller
      */
     public function index()
     {
-        //
+        $accountings = Accounting::all();
+        return inertia('Accountings/Index', [
+            'accountings' => $accountings,
+        ]);
     }
 
     /**

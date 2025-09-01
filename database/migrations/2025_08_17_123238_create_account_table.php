@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('account', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description')->nullable();
-            $table->boolean('status')->default(false);
+            $table->text('description')->nullable();
+            $table->boolean('status')->default(true);
             $table->string('reff');
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

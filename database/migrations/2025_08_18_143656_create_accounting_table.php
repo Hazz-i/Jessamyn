@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('description');
             $table->decimal('credit', 10, 2);
             $table->decimal('debit', 10, 2);
-            $table->string('image');
+            $table->string('image')->nullable();
+            $table->string('note')->nullable();
 
             $table->foreignId('account_id')->constrained('account')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

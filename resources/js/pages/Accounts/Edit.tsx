@@ -12,18 +12,20 @@ type AccountForm = {
     reff: string;
 };
 
-type CreateAccountProps = {
+type EditAccountProps = {
     setOpen: (open: boolean) => void;
     open: boolean;
-    // onSuccess: () => void;
+    account: any;
 };
 
-export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
-    const { data, setData, post, processing, errors, reset, clearErrors, transform } = useForm<AccountForm>({
-        name: '',
-        description: '',
-        status: '1',
-        reff: '',
+export default function EditAccount({ setOpen, open, account }: EditAccountProps) {
+    console.log(account);
+
+    const { data, setData, post, put, processing, errors, reset, clearErrors, transform } = useForm<AccountForm>({
+        name: account.name,
+        description: account.description,
+        status: account.status ? '1' : '0',
+        reff: account.reff,
     });
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -37,8 +39,7 @@ export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
             ...d,
             status: (d.status === '1') as unknown as string,
         }));
-        post(route('accounts.store'), {
-            forceFormData: true,
+        put(route('accounts.update', account.id), {
             preserveScroll: true,
             onSuccess: () => {
                 setOpen(false);
@@ -60,13 +61,13 @@ export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
             }}
         >
             <DialogTrigger asChild>
-                <button className="flex cursor-pointer items-center justify-center rounded-lg bg-primary p-2">
-                    <i className="bx bx-plus text-xl text-white" />
+                <button className="flex cursor-pointer items-center justify-center p-2">
+                    <i className="bx bx-edit text-xl text-primary" />
                 </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
-                <DialogTitle>Create Account</DialogTitle>
-                <DialogDescription>Fill in the account details below.</DialogDescription>
+                <DialogTitle>Edit Account</DialogTitle>
+                <DialogDescription>Update the account details below.</DialogDescription>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Account Name</Label>
@@ -116,7 +117,7 @@ export default function CreateAccount({ setOpen, open }: CreateAccountProps) {
                             </Button>
                         </DialogClose>
                         <Button type="submit" disabled={processing}>
-                            {processing ? 'Saving' : 'Save Product'}
+                            {processing ? 'Updating' : 'Update Account'}
                         </Button>
                     </DialogFooter>
                 </form>

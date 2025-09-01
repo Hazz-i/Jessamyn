@@ -40,14 +40,17 @@ class AccountController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'status' => 'required|boolean',
+            'reff' => 'required|string',
         ]);
 
         // Create account respecting fillable and set status explicitly if not fillable
         $account = new Account([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
+            'reff' => $validated['reff'] ?? null,
             'user_id' => auth()->id(),
         ]);
+        
         $account->status = (bool) $validated['status'];
         $account->save();
 
@@ -78,23 +81,18 @@ class AccountController extends Controller
     public function update(Request $request, Account $account)
     {
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|nullable|string',
-            'status' => 'sometimes|required|boolean',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|boolean',
+            'reff' => 'required|string',
         ]);
 
-        // Update only provided fields
-        if (array_key_exists('name', $validated)) {
-            $account->name = $validated['name'];
-        }
-        if (array_key_exists('description', $validated)) {
-            $account->description = $validated['description'];
-        }
-        if (array_key_exists('status', $validated)) {
-            $account->status = (bool) $validated['status'];
-        }
-
-        $account->save();
+        $account->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
+            'reff' => $validated['reff'],
+        ]);
 
         return redirect()->route('accounts.index')->with('success', 'Account updated successfully.');
     }
