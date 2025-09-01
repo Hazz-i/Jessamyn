@@ -4,6 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@inertiajs/react';
+import { useEffect, useMemo } from 'react';
 
 // Modal + Form state for creating product
 type ProductForm = {
@@ -19,6 +20,9 @@ type CreateProductProps = {
     open: boolean;
 };
 
+const SINGLE_VARIANTS: string[] = ['25ml', '60ml', '100ml', '120ml', '250ml'];
+const BUNDLE_VARIANTS: string[] = ['60ml-25ml-100ml'];
+
 export default function CreateProductVariant({ product, setOpen, open }: CreateProductProps) {
     const { data, setData, post, processing, errors, reset, clearErrors, transform } = useForm<ProductForm>({
         variant: '',
@@ -27,8 +31,28 @@ export default function CreateProductVariant({ product, setOpen, open }: CreateP
         stock_qty: 0,
     });
 
-    // Determine which category to use for UI logic: prefer product.category, fallback to selected form category
     const effectiveCategory = (product?.category ?? data.category ?? '').toString().toLowerCase();
+
+    const extractVariantName = (v: any) => {
+        if (!v) return '';
+        if (typeof v === 'string') return v;
+        return (v.variant ?? '').toString();
+    };
+
+    const existingVariantSet = useMemo(() => {
+        const raw = product?.variants ?? [];
+        const names = Array.isArray(raw) ? raw.map(extractVariantName).filter(Boolean) : [];
+        return new Set(names.map((s: string) => s.toLowerCase()));
+    }, [product]);
+
+    const baseOptions = effectiveCategory === 'bundle' ? [...BUNDLE_VARIANTS] : [...SINGLE_VARIANTS];
+    const availableVariants = baseOptions.filter((opt) => !existingVariantSet.has(opt.toLowerCase()));
+
+    useEffect(() => {
+        if (data.variant && !availableVariants.includes(data.variant)) {
+            setData('variant', '');
+        }
+    }, [availableVariants, data.variant, setData]);
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -39,7 +63,6 @@ export default function CreateProductVariant({ product, setOpen, open }: CreateP
         e.preventDefault();
         transform((d) => ({
             ...d,
-            // Use the product category if it exists, otherwise send the selected category from the form
             category: product?.category ?? d.category,
         }));
         post(route('product.variants.store', product.id), {
@@ -94,22 +117,20 @@ export default function CreateProductVariant({ product, setOpen, open }: CreateP
                         <Label htmlFor="variant">Variant</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button type="button" variant="outline" className="justify-between">
+                                <Button type="button" variant="outline" className="justify-between" disabled={availableVariants.length === 0}>
                                     {data.variant ? data.variant : 'Select Variant'}
                                     <i className="bx bx-chevron-down ml-2" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start" className="min-w-[12rem]">
-                                {effectiveCategory === 'bundle' ? (
-                                    <DropdownMenuItem onClick={() => setData('variant', '60ml-25ml-100ml')}>60ml-25ml-100ml</DropdownMenuItem>
+                                {availableVariants.length > 0 ? (
+                                    availableVariants.map((opt) => (
+                                        <DropdownMenuItem key={opt} onClick={() => setData('variant', opt)}>
+                                            {opt}
+                                        </DropdownMenuItem>
+                                    ))
                                 ) : (
-                                    <>
-                                        <DropdownMenuItem onClick={() => setData('variant', '25ml')}>25ml</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setData('variant', '60ml')}>60ml</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setData('variant', '100ml')}>100ml</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setData('variant', '120ml')}>120ml</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setData('variant', '250ml')}>250ml</DropdownMenuItem>
-                                    </>
+                                    <DropdownMenuItem disabled>Semua variant sudah ditambahkan</DropdownMenuItem>
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>

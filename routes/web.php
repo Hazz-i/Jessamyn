@@ -41,9 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('jurnal-umum', function () {
         return Inertia::render('JurnalUmum/Index');
     })->name('jurnalUmum.index');
-    Route::get('buku-besar', function () {
-        return Inertia::render('BukuBesar/Index');
-    })->name('bukuBesar.index');
+    Route::get('reporting', function () {
+        return Inertia::render('Reporting/Index');
+    })->name('reporting.index');
 });
 
 Route::fallback(function () {

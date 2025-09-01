@@ -35,8 +35,8 @@ const activityNavItems: NavItem[] = [
         icon: 'bx bx-user',
     },
     {
-        title: 'Buku Besar',
-        href: '/buku-besar',
+        title: 'Reporting',
+        href: '/reporting',
         icon: 'bx bx-receipt',
     },
 ];
