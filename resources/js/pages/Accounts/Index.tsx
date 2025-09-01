@@ -80,7 +80,7 @@ export default function Account() {
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Toaster position="top-right" reverseOrder={false} />
-                {/* Product Summary */}
+                {/* Accpount Head */}
                 <span className="grid gap-1">
                     <div className="flex items-center gap-2">
                         <h1 className="text-xl font-medium">Account</h1>
@@ -91,7 +91,7 @@ export default function Account() {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <i className="bx bx-help-circle"></i>
+                            <i className="bx bx-help-circle sm:text-sm"></i>
                         </a>
                     </div>
                     <p className="text-sm text-[#B5B5B5]">
@@ -103,23 +103,23 @@ export default function Account() {
 
                 {/* Product List */}
                 <span className="grid gap-2">
-                    <span className="flex items-center justify-between">
+                    <span className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="grid gap-1">
                             <span className="flex items-center gap-2">
                                 <h1 className="text-xl font-medium">Account List</h1>
-                                <small className="text-foreground">({totalAccounts} accounts)</small>
+                                <small className="text-xs text-foreground">({totalAccounts} accounts)</small>
                             </span>
                             <p className="text-sm text-[#B5B5B5]">Daftar Akun</p>
                         </div>
 
-                        <div className="me-1 flex items-center justify-center gap-2">
+                        <div className="me-1 flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-center">
                             <p className="text-sm font-semibold text-primary">Add Account</p>
                             <CreateAccount open={open} setOpen={setOpen} />
                         </div>
                     </span>
 
                     {/* Table */}
-                    <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="relative overflow-x-auto rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <Table>
                             <TableHeader>
                                 <TableRow>

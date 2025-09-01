@@ -19,8 +19,6 @@ type EditAccountProps = {
 };
 
 export default function EditAccount({ setOpen, open, account }: EditAccountProps) {
-    console.log(account);
-
     const { data, setData, post, put, processing, errors, reset, clearErrors, transform } = useForm<AccountForm>({
         name: account.name,
         description: account.description,
