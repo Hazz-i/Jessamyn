@@ -8,17 +8,19 @@ use App\Models\Product;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariantController;
+use App\Http\Controllers\JurnalUmumController;
+use App\Http\Controllers\AccountingController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/all-products', [HomeController::class, 'products'])->name('products');
+Route::get('/productShow/{product}', [HomeController::class, 'showProduct'])->name('products.show');
 // Route::get('/productShow/{id}', function ($id) {
 //     $product = Product::findOrFail($id);
 //     return Inertia::render('Home/ProductDetail', [
 //         'product' => $product
 //     ]);
 // })->name('products.show');\
-Route::get('/productShow/{product}', [HomeController::class, 'showProduct'])->name('products.show');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -32,18 +34,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('product.variants', ProductVariantController::class)->only(['store', 'update', 'destroy']);
     
     Route::resource('accounts', AccountController::class);
+    Route::resource('jurnal-umum', JurnalUmumController::class)
+        ->parameters(['jurnal-umum' => 'accounting']);
+    Route::resource('reporting', AccountingController::class);
 
     Route::get('transactions', function () {
         return Inertia::render('Transactions/Index');
     })->name('transactions.index');
 
     // Activity - Accounting Route
-    Route::get('jurnal-umum', function () {
-        return Inertia::render('JurnalUmum/Index');
-    })->name('jurnalUmum.index');
-    Route::get('reporting', function () {
-        return Inertia::render('Reporting/Index');
-    })->name('reporting.index');
+    // Route::get('jurnal-umum', function () {
+    //     return Inertia::render('JurnalUmum/Index');
+    // })->name('jurnalUmum.index');
+    // Route::get('reporting', function () {
+    //     return Inertia::render('Reporting/Index');
+    // })->name('reporting.index');
 });
 
 Route::fallback(function () {

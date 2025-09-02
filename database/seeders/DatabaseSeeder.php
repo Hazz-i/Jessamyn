@@ -111,5 +111,9 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        $this->call([
+        AccountingSeeder::class,     // Jurnal Umum Agustus
+    ]);
+
     }
 }

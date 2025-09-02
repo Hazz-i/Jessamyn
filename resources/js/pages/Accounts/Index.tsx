@@ -156,7 +156,7 @@ export default function Account() {
                                                     {account.status ? 'Active' : 'Inactive'}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="flex w-[5rem] items-center justify-center">
+                                            <TableCell className="flex w-[5rem] items-center justify-center gap-2">
                                                 <EditAccount account={account} setOpen={setIsUpdate} open={isUpdate} />
                                                 <DeleteAccount account={account} />
                                             </TableCell>

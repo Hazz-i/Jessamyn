@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Accounting;
+use App\Models\Account;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AccountingController extends Controller
 {
@@ -12,9 +14,12 @@ class AccountingController extends Controller
      */
     public function index()
     {
-        $accountings = Accounting::all();
-        return inertia('Accountings/Index', [
+        // Load related account so the frontend can display the account name
+        $accountings = Accounting::with(['account:id,name'])->latest()->get();
+        $accounts = Account::select('id', 'name')->orderBy('name')->get();
+        return inertia('Reporting/Index', [
             'accountings' => $accountings,
+            'accounts' => $accounts,
         ]);
     }
 
@@ -31,7 +36,7 @@ class AccountingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+    
     }
 
     /**

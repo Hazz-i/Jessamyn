@@ -2,9 +2,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import CreateJurnalUmum from './Create';
+import DeleteRecord from './Delete';
+import EditRecord from './Edit';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,17 +16,31 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function JurnalUmum() {
-    const { data } = usePage<any>().props;
+type JurnalUmumProps = {
+    accountings: any;
+    accounts: any;
+    flash?: { success?: string; error?: string };
+};
+
+export default function JurnalUmum({ accountings, accounts, flash }: JurnalUmumProps) {
     const [open, setOpen] = useState(false);
 
-    const dataArray = data || [];
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash?.success, flash?.error]);
 
+    const totalRecords = accountings.length;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Jurnal Umum" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Toaster position="top-right" reverseOrder={false} />
                 {/* Jurnal Umum Head */}
                 <span className="grid gap-1">
                     <h1 className="text-xl font-medium">Jurnal Umum</h1>
@@ -32,18 +49,20 @@ export default function JurnalUmum() {
                         berurutan berdasarkan tanggal kejadian, lengkap dengan akun yang didebit dan dikredit.
                     </p>
                 </span>
-
                 {/* Product List */}
                 <span className="grid gap-2">
                     <span className="flex items-center justify-between">
                         <div className="grid gap-1">
-                            <h1 className="text-xl font-medium">Jurnal Umum Detail</h1>
+                            <span className="flex items-center gap-2">
+                                <h1 className="text-xl font-medium">Jurnal Umum Details</h1>
+                                <small className="text-xs text-foreground">({totalRecords} records)</small>
+                            </span>
                             <p className="text-sm text-[#B5B5B5]">Daftar Jurnal Umum</p>
                         </div>
 
                         <div className="me-1 flex items-center justify-center gap-2">
                             <p className="text-sm font-semibold text-primary">Add Record</p>
-                            <CreateJurnalUmum open={open} setOpen={setOpen} />
+                            <CreateJurnalUmum open={open} setOpen={setOpen} accounts={accounts} />
                         </div>
                     </span>
 
@@ -59,33 +78,47 @@ export default function JurnalUmum() {
                                     <TableHead className="text-center">Account</TableHead>
                                     <TableHead className="text-center">Debits</TableHead>
                                     <TableHead className="text-center">Credits</TableHead>
-                                    <TableHead className="text-center">Date</TableHead>
+                                    <TableHead className="text-center">Proof</TableHead>
                                     <TableHead className="w-[100px] text-center"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {dataArray.length > 0 ? (
-                                    dataArray.map((p: any) => (
-                                        <TableRow key={p.id}>
+                                {accountings.length > 0 ? (
+                                    accountings.map((record: any) => (
+                                        <TableRow key={record.id}>
                                             <TableCell className="py-4">
                                                 <Checkbox />
                                             </TableCell>
-                                            <TableCell className="text-center font-medium">{p.description}</TableCell>
+                                            <TableCell className="text-center font-medium">{record.description}</TableCell>
                                             <TableCell className="text-center">
-                                                {p.account ? <span>{p.account}</span> : <span className="text-gray-400">No account</span>}
+                                                {record.account?.name ? (
+                                                    <span>{record.account.name}</span>
+                                                ) : record.account_id ? (
+                                                    <span className="text-gray-400">#{record.account_id}</span>
+                                                ) : (
+                                                    <span className="text-gray-400">No account</span>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {p.debits ? <span>{p.debits}</span> : <span className="text-gray-400">-</span>}
+                                                {record.debit ? (
+                                                    <span>Rp {Number(record.debit).toLocaleString('id-ID')}</span>
+                                                ) : (
+                                                    <span className="text-gray-400">-</span>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {p.credits ? <span>{p.credits}</span> : <span className="text-gray-400">-</span>}
+                                                {record.credit ? (
+                                                    <span>Rp {Number(record.credit).toLocaleString('id-ID')}</span>
+                                                ) : (
+                                                    <span className="text-gray-400">-</span>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {p.date ? <span>{p.date}</span> : <span className="text-gray-400">No date</span>}
+                                                {record.image ? <span>{record.image}</span> : <span>{record.note}</span>}
                                             </TableCell>
-                                            <TableCell className="items-center space-x-5">
-                                                {/* <EditProduct product={p} /> */}
-                                                {/* <DeleteProduct id={p.id} name={p.name} /> */}
+                                            <TableCell className="flex items-center justify-center gap-2">
+                                                <EditRecord record={record} accounts={accounts} />
+                                                <DeleteRecord record={record} />
                                             </TableCell>
                                         </TableRow>
                                     ))
