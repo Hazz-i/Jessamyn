@@ -15,10 +15,10 @@ class AccountingController extends Controller
     public function index()
     {
         // Load related account so the frontend can display the account name
-        $accountings = Accounting::with(['account:id,name'])->latest()->get();
-        $accounts = Account::select('id', 'name')->orderBy('name')->get();
+        $records = Accounting::with(['account:id,name,reff'])->latest()->get();
+        $accounts = Account::select('id', 'name', 'reff')->orderBy('name')->get();
         return inertia('Reporting/Index', [
-            'accountings' => $accountings,
+            'records' => $records,
             'accounts' => $accounts,
         ]);
     }
