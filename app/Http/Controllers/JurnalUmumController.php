@@ -43,6 +43,7 @@ class JurnalUmumController extends Controller
             'description' => ['required', 'string', 'max:255'],
             'note' => ['nullable', 'string'],
             'image' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
+            'date' => ['nullable', 'date'],
 
             'debits' => ['required', 'array', 'min:1'],
             'debits.*.account_id' => ['required', 'exists:account,id'],
@@ -59,7 +60,7 @@ class JurnalUmumController extends Controller
         }
 
         // Create debit rows
-        foreach ($validated['debits'] as $line) {
+    foreach ($validated['debits'] as $line) {
             Accounting::create([
                 'description' => $validated['description'],
                 'debit' => $line['amount'],
@@ -68,11 +69,12 @@ class JurnalUmumController extends Controller
                 'account_id' => $line['account_id'],
                 'user_id' => Auth::id(),
                 'image' => $imagePath,
+        'date' => $validated['date'] ?? now()->toDateString(),
             ]);
         }
 
         // Create credit rows
-        foreach ($validated['credits'] as $line) {
+    foreach ($validated['credits'] as $line) {
             Accounting::create([
                 'description' => $validated['description'],
                 'debit' => 0,
@@ -81,6 +83,7 @@ class JurnalUmumController extends Controller
                 'account_id' => $line['account_id'],
                 'user_id' => Auth::id(),
                 'image' => $imagePath,
+        'date' => $validated['date'] ?? now()->toDateString(),
             ]);
         }
 
@@ -117,6 +120,7 @@ class JurnalUmumController extends Controller
             'side' => ['required', 'in:debit,credit'],
             'amount' => ['required', 'numeric', 'min:0'],
             'image' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
+            'date' => ['nullable', 'date'],
         ]);
 
         // Handle optional image replacement
@@ -133,6 +137,9 @@ class JurnalUmumController extends Controller
         $accounting->description = $validated['description'];
         $accounting->note = $validated['note'] ?? null;
         $accounting->account_id = $validated['account_id'];
+        if (!empty($validated['date'])) {
+            $accounting->date = $validated['date'];
+        }
         if ($validated['side'] === 'debit') {
             $accounting->debit = $validated['amount'];
             $accounting->credit = 0;

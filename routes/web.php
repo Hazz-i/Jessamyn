@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariantController;
 use App\Http\Controllers\JurnalUmumController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\ShopeeImportController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -37,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('jurnal-umum', JurnalUmumController::class)
         ->parameters(['jurnal-umum' => 'accounting']);
     Route::resource('reporting', AccountingController::class);
+    Route::get('reporting/export/worksheet', [AccountingController::class, 'exportWorksheet'])->name('reporting.export.worksheet');
+
+    Route::post('shopee/preview', [ShopeeImportController::class, 'preview'])->name('shopee.preview');
+    Route::post('shopee/commit',  [ShopeeImportController::class, 'commit'])->name('shopee.commit');
 
     Route::get('transactions', function () {
         return Inertia::render('Transactions/Index');

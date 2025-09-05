@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Carbon;
 
 return new class extends Migration
 {
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->decimal('debit', 10, 2);
             $table->string('image')->nullable();
             $table->string('note')->nullable();
+            $table->date('date')->default(Carbon::now());
 
             $table->foreignId('account_id')->constrained('account')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -33,3 +35,4 @@ return new class extends Migration
         Schema::dropIfExists('accounting');
     }
 };
+    

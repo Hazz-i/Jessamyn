@@ -14,6 +14,7 @@ type JournalForm = {
     // Multiple credit lines, each with account and amount
     credits: Array<{ account_id: string; amount: string }>;
     image: File | null;
+    date?: string;
 };
 
 type CreateJurnalUmumProps = {
@@ -29,6 +30,7 @@ export default function CreateJurnalUmum({ setOpen, open, accounts }: CreateJurn
         debits: [{ account_id: '', amount: '' }],
         credits: [{ account_id: '', amount: '' }],
         image: null,
+        date: new Date().toISOString().slice(0, 10),
     });
 
     const fieldError = (key: string): string | undefined => {
@@ -127,13 +129,19 @@ export default function CreateJurnalUmum({ setOpen, open, accounts }: CreateJurn
                         {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                     </div>
 
+                    <div className="grid gap-2">
+                        <Label htmlFor="date">Date</Label>
+                        <Input id="date" name="date" type="date" value={data.date} onChange={handleInput} className="" />
+                        {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
+                    </div>
+
                     {/* Debit */}
                     <span className="flex flex-col items-start justify-center gap-2">
                         <Label>Debit</Label>
                         <div className="grid w-full gap-4">
                             {data.debits.map((line, idx) => (
                                 <div key={idx} className="flex items-end justify-center gap-2">
-                                    <div className="grid gap-2 flex-1">
+                                    <div className="grid flex-1 gap-2">
                                         <Label>Account</Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -190,10 +198,10 @@ export default function CreateJurnalUmum({ setOpen, open, accounts }: CreateJurn
                     {/* Credit */}
                     <span className="flex flex-col items-start justify-center gap-2">
                         <Label>Credit</Label>
-                        <div className="grid gap-4 w-full">
+                        <div className="grid w-full gap-4">
                             {data.credits.map((line, idx) => (
                                 <div key={idx} className="flex items-end justify-center gap-2">
-                                    <div className="grid gap-2 flex-1">
+                                    <div className="grid flex-1 gap-2">
                                         <Label>Account</Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

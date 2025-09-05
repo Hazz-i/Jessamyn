@@ -59,13 +59,13 @@ class DatabaseSeeder extends Seeder
 
             // 3xx E K U I T A S
             ['301','Modal Pemilik','Setoran pemilik'],
-            ['302','Prive','Pengambilan oleh pemilik (– Ekuitas)'],
+            ['302','Prive','Pengambilan oleh pemilik (- Ekuitas)'],
             ['303','Laba Ditahan','Akumulasi laba/rugi periode lalu'],
 
             // 4xx P E N D A P A T A N
             ['401','Penjualan','Penjualan baby oil'],
-            ['402','Retur & Potongan Penjualan','Kontra pendapatan (–)'],
-            ['403','Diskon Penjualan','Kontra pendapatan (–)'],
+            ['402','Retur & Potongan Penjualan','Kontra pendapatan ()'],
+            ['403','Diskon Penjualan','Kontra pendapatan ()'],
             ['404','Pendapatan Lain-lain','Bunga bank, dll.'],
 
             // 5xx H P P / B I A Y A   P O K O K

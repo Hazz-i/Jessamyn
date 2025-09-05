@@ -8,6 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import CreateJurnalUmum from './Create';
 import DeleteRecord from './Delete';
 import EditRecord from './Edit';
+import UploadFile from './UpploadFile';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,6 +25,7 @@ type JurnalUmumProps = {
 
 export default function JurnalUmum({ accountings, accounts, flash }: JurnalUmumProps) {
     const [open, setOpen] = useState(false);
+    const [isUploadFile, setIsUploadFile] = useState(false);
 
     useEffect(() => {
         if (flash?.success) {
@@ -63,6 +65,7 @@ export default function JurnalUmum({ accountings, accounts, flash }: JurnalUmumP
                         <div className="me-1 flex items-center justify-center gap-2">
                             <p className="text-sm font-semibold text-primary">Add Record</p>
                             <CreateJurnalUmum open={open} setOpen={setOpen} accounts={accounts} />
+                            <UploadFile open={isUploadFile} setOpen={setIsUploadFile} accounts={accounts} />
                         </div>
                     </span>
 

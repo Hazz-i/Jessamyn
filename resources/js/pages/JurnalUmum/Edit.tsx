@@ -30,6 +30,7 @@ export default function EditRecord({ record, accounts }: EditRecordProps) {
         amount: String(record.debit ?? record.credit ?? ''),
         side: record.debit && Number(record.debit) > 0 ? 'debit' : 'credit',
         image: null as File | null,
+        date: (record as any).date ? String((record as any).date).slice(0, 10) : new Date().toISOString().slice(0, 10),
     });
 
     const accountLabel = (id: string) => {
@@ -81,6 +82,12 @@ export default function EditRecord({ record, accounts }: EditRecordProps) {
                             required
                         />
                         {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label>Date</Label>
+                        <Input type="date" name="date" value={(data as any).date} onChange={handleInput} />
+                        {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
                     </div>
 
                     <div className="grid gap-2">

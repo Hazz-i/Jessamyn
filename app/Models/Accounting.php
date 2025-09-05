@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Accounting extends Model
 {
     use HasFactory;
+    
     protected $table = 'accounting';
     protected $fillable = [
         'user_id',
@@ -17,7 +18,12 @@ class Accounting extends Model
         'debit',
         'credit',
         'note',
-        'image'
+        'image',
+        'date',
+    ];
+
+    protected $casts = [
+        'date' => 'date:Y-m-d',
     ];
 
     public function account()
