@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import ReportingTable from '@/components/ui/reporting-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -14,30 +15,31 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export default function Reporting({ records, accounts, reporting }: any) {
+    const [selectedDate, setSelectedDate] = useState<string>(() => {
+        const period = reporting?.period as string | undefined;
+        if (period && /^\d{4}-\d{2}$/.test(period)) return period;
+        const d = new Date();
+        const m = `${d.getMonth() + 1}`.padStart(2, '0');
+        return `${d.getFullYear()}-${m}`; // YYYY-MM for type="month"
+    });
 
-export default function Reporting({ records, accounts }: any) {
-    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    useEffect(() => {
+        const period = reporting?.period as string | undefined;
+        if (period && /^\d{4}-\d{2}$/.test(period) && period !== selectedDate) {
+            setSelectedDate(period);
+        }
+    }, [reporting?.period]);
 
     // Label for headings
     const monthLabel = useMemo(() => {
-        const d = new Date(selectedDate);
+        const d = new Date(`${selectedDate}-01`);
         if (!(d instanceof Date) || isNaN(d as any)) return '';
         return d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
     }, [selectedDate]);
 
-    // Compute records for the selected year & month only
-    const monthRecords = useMemo(() => {
-        const recs = Array.isArray(records) ? records : [];
-        const d = new Date(selectedDate);
-        if (!(d instanceof Date) || isNaN(d as any)) return recs;
-        const selYear = d.getFullYear();
-        const selMonth = d.getMonth();
-        return recs.filter((r: any) => {
-            const created = r?.created_at ? new Date(r.created_at) : null;
-            return created instanceof Date && !isNaN(created as any) && created.getFullYear() === selYear && created.getMonth() === selMonth;
-        });
-    }, [records, selectedDate]);
+    // Records already filtered by server for the selected month
+    const monthRecords = useMemo(() => (Array.isArray(records) ? records : []), [records]);
 
     // Derive accounts that actually have data (in the selected month)
     const accountsWithData = useMemo(() => {
@@ -73,91 +75,20 @@ export default function Reporting({ records, accounts }: any) {
         return String(recAccountId) === String(selectedAccount.id);
     });
 
-    // Totals for Buku Besar
-    const bukuBesarTotals = useMemo(() => {
-        return filteredRecords.reduce(
-            (acc: { debit: number; credit: number }, r: any) => {
-                acc.debit += Number(r?.debit ?? 0);
-                acc.credit += Number(r?.credit ?? 0);
-                return acc;
-            },
-            { debit: 0, credit: 0 },
-        );
+    // Buku Besar rows adapted for ReportingTable
+    const bukuBesarRows = useMemo(() => {
+        return (filteredRecords ?? []).map((r: any) => ({
+            account_id: r?.account_id ?? r?.account?.id,
+            name: r?.account?.name ?? (r?.account_id ? `#${r.account_id}` : undefined),
+            // Pass undefined for 0 to render '-' like the original table
+            debitAmount: r?.debit ? Number(r.debit) : undefined,
+            creditAmount: r?.credit ? Number(r.credit) : undefined,
+        }));
     }, [filteredRecords]);
 
-    // Neraca Saldo: accumulate per account (sum debit - sum credit). Positive -> Debit, Negative -> Credit. Only for reff 1,2,3
-    const neracaSaldoRecords = useMemo(() => {
-        const accMap = new Map<string, { account_id: string; name: string; debitSum: number; creditSum: number }>();
-        (monthRecords ?? []).forEach((r: any) => {
-            const code: string | undefined = r?.account?.reff ?? accounts?.find?.((a: any) => String(a.id) === String(r.account_id))?.reff;
-            if (!code) return;
-            if (!(code.startsWith('1') || code.startsWith('2') || code.startsWith('3'))) return;
-            const accountId = String(r?.account_id ?? r?.account?.id ?? '');
-            if (!accountId) return;
-            const name = r?.account?.name ?? accounts?.find?.((a: any) => String(a.id) === accountId)?.name ?? `#${accountId}`;
-            const curr = accMap.get(accountId) ?? { account_id: accountId, name, debitSum: 0, creditSum: 0 };
-            curr.debitSum += Number(r?.debit ?? 0);
-            curr.creditSum += Number(r?.credit ?? 0);
-            accMap.set(accountId, curr);
-        });
-        return Array.from(accMap.values()).map((row) => {
-            const net = row.debitSum - row.creditSum; // positive => debit, negative => credit
-            return {
-                account_id: row.account_id,
-                name: row.name,
-                debitAmount: net > 0 ? net : 0,
-                creditAmount: net < 0 ? Math.abs(net) : 0,
-            };
-        });
-    }, [monthRecords, accounts]);
-
-    const neracaSaldoTotals = useMemo(() => {
-        return neracaSaldoRecords.reduce(
-            (acc: { debit: number; credit: number }, r: any) => {
-                acc.debit += Number(r?.debitAmount ?? 0);
-                acc.credit += Number(r?.creditAmount ?? 0);
-                return acc;
-            },
-            { debit: 0, credit: 0 },
-        );
-    }, [neracaSaldoRecords]);
-
-    // Laba/Rugi Saldo: accumulate per account (sum debit - sum credit). Positive -> Debit, Negative -> Credit. Only for reff 4,5,6,7
-    const labaRugiSaldoRecords = useMemo(() => {
-        const accMap = new Map<string, { account_id: string; name: string; debitSum: number; creditSum: number }>();
-        (monthRecords ?? []).forEach((r: any) => {
-            const code: string | undefined = r?.account?.reff ?? accounts?.find?.((a: any) => String(a.id) === String(r.account_id))?.reff;
-            if (!code) return;
-            if (!(code.startsWith('4') || code.startsWith('5') || code.startsWith('6') || code.startsWith('7'))) return;
-            const accountId = String(r?.account_id ?? r?.account?.id ?? '');
-            if (!accountId) return;
-            const name = r?.account?.name ?? accounts?.find?.((a: any) => String(a.id) === accountId)?.name ?? `#${accountId}`;
-            const curr = accMap.get(accountId) ?? { account_id: accountId, name, debitSum: 0, creditSum: 0 };
-            curr.debitSum += Number(r?.debit ?? 0);
-            curr.creditSum += Number(r?.credit ?? 0);
-            accMap.set(accountId, curr);
-        });
-        return Array.from(accMap.values()).map((row) => {
-            const net = row.debitSum - row.creditSum; // positive => debit, negative => credit
-            return {
-                account_id: row.account_id,
-                name: row.name,
-                debitAmount: net > 0 ? net : 0,
-                creditAmount: net < 0 ? Math.abs(net) : 0,
-            };
-        });
-    }, [monthRecords, accounts]);
-
-    const labaRugiTotals = useMemo(() => {
-        return labaRugiSaldoRecords.reduce(
-            (acc: { debit: number; credit: number }, r: any) => {
-                acc.debit += Number(r?.debitAmount ?? 0);
-                acc.credit += Number(r?.creditAmount ?? 0);
-                return acc;
-            },
-            { debit: 0, credit: 0 },
-        );
-    }, [labaRugiSaldoRecords]);
+    // Use server-provided datasets
+    const neracaRecords = useMemo(() => (Array.isArray(reporting?.neraca) ? reporting.neraca : []), [reporting?.neraca]);
+    const labaRugiSaldoRecords = useMemo(() => (Array.isArray(reporting?.laba_rugi) ? reporting.laba_rugi : []), [reporting?.laba_rugi]);
 
     // Kertas Kerja (Worksheet) — simplified to three sections
     // Columns: Neraca Saldo, Laba/Rugi, Neraca (each with Debit/Kredit)
@@ -239,15 +170,20 @@ export default function Reporting({ records, accounts }: any) {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <h1 className="text-xl font-medium sm:text-2xl">Reporting</h1>
                         <div className="flex items-center gap-2">
-                            <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-[10rem]" />
-                            <a
-                                href={route('reporting.export.worksheet', { date: selectedDate }) as unknown as string}
-                                className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm hover:bg-accent"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Export Excel
-                            </a>
+                            <Input
+                                type="month"
+                                value={selectedDate}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setSelectedDate(val);
+                                    router.visit(route('reporting.index', { date: val }) as unknown as string, {
+                                        preserveScroll: true,
+                                        preserveState: true,
+                                        replace: true,
+                                    });
+                                }}
+                                className="w-[11rem]"
+                            />
                         </div>
                     </div>
                     <p className="text-sm text-[#B5B5B5]">
@@ -285,206 +221,61 @@ export default function Reporting({ records, accounts }: any) {
                                 </DropdownMenu>
                             </div>
                             <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[100px] text-center">Account</TableHead>
-                                            <TableHead className="text-center">Debits</TableHead>
-                                            <TableHead className="text-center">Credits</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {filteredRecords.length > 0 ? (
-                                            <>
-                                                {filteredRecords.map((record: any) => (
-                                                    <TableRow key={record.id}>
-                                                        <TableCell className="text-center">
-                                                            {record.account?.name ? (
-                                                                <span>{record.account.name}</span>
-                                                            ) : record.account_id ? (
-                                                                <span className="text-gray-400">#{record.account_id}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">No account</span>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            {record.debit ? (
-                                                                <span>Rp {Number(record.debit).toLocaleString('id-ID')}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">-</span>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            {record.credit ? (
-                                                                <span>Rp {Number(record.credit).toLocaleString('id-ID')}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">-</span>
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                                <TableRow>
-                                                    <TableCell className="text-right font-medium">Total</TableCell>
-                                                    <TableCell className="text-center font-medium">
-                                                        Rp {bukuBesarTotals.debit.toLocaleString('id-ID')}
-                                                    </TableCell>
-                                                    <TableCell className="text-center font-medium">
-                                                        Rp {bukuBesarTotals.credit.toLocaleString('id-ID')}
-                                                    </TableCell>
-                                                </TableRow>
-                                            </>
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={7} className="text-center text-gray-400">
-                                                    No Record Available.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                <ReportingTable data={bukuBesarRows} />
                             </div>
                         </span>
 
                         {/* Neraca */}
                         <span className="grid gap-5">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium sm:text-xl">Neraca {monthLabel}</h2>
+                                <h2 className="text-lg font-medium sm:text-xl">Neraca Saldo</h2>
                             </div>
                             <div className="relative aspect-video overflow-y-scroll rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[100px] text-center">Account</TableHead>
-                                            <TableHead className="text-center">Debits</TableHead>
-                                            <TableHead className="text-center">Credits</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {neracaSaldoRecords.length > 0 ? (
-                                            <>
-                                                {neracaSaldoRecords.map((row: any) => (
-                                                    <TableRow key={row.account_id}>
-                                                        <TableCell className="text-center">
-                                                            {row.name ? <span>{row.name}</span> : <span className="text-gray-400">No account</span>}
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            {row.debitAmount ? (
-                                                                <span>Rp {Number(row.debitAmount).toLocaleString('id-ID')}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">-</span>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            {row.creditAmount ? (
-                                                                <span>Rp {Number(row.creditAmount).toLocaleString('id-ID')}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">-</span>
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                                <TableRow>
-                                                    <TableCell className="text-right font-medium">Total</TableCell>
-                                                    <TableCell className="text-center font-medium">
-                                                        Rp {neracaSaldoTotals.debit.toLocaleString('id-ID')}
-                                                    </TableCell>
-                                                    <TableCell className="text-center font-medium">
-                                                        Rp {neracaSaldoTotals.credit.toLocaleString('id-ID')}
-                                                    </TableCell>
-                                                </TableRow>
-                                            </>
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={7} className="text-center text-gray-400">
-                                                    No Record Available.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                <ReportingTable data={neracaRecords} />
                             </div>
                         </span>
 
                         {/* Laba/Rugi */}
                         <span className="grid gap-5">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium sm:text-xl">Laba/Rugi {monthLabel}</h2>
+                                <h2 className="text-lg font-medium sm:text-xl">Laba/Rugi</h2>
                             </div>
                             <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[100px] text-center">Account</TableHead>
-                                            <TableHead className="text-center">Debits</TableHead>
-                                            <TableHead className="text-center">Credits</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {labaRugiSaldoRecords.length > 0 ? (
-                                            <>
-                                                {labaRugiSaldoRecords.map((row: any) => (
-                                                    <TableRow key={row.account_id}>
-                                                        <TableCell className="text-center">
-                                                            {row.name ? <span>{row.name}</span> : <span className="text-gray-400">No account</span>}
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            {row.debitAmount ? (
-                                                                <span>Rp {Number(row.debitAmount).toLocaleString('id-ID')}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">-</span>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            {row.creditAmount ? (
-                                                                <span>Rp {Number(row.creditAmount).toLocaleString('id-ID')}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">-</span>
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                                <TableRow>
-                                                    <TableCell className="text-right font-medium">Total</TableCell>
-                                                    <TableCell className="text-center font-medium">
-                                                        Rp {labaRugiTotals.debit.toLocaleString('id-ID')}
-                                                    </TableCell>
-                                                    <TableCell className="text-center font-medium">
-                                                        Rp {labaRugiTotals.credit.toLocaleString('id-ID')}
-                                                    </TableCell>
-                                                </TableRow>
-                                            </>
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={7} className="text-center text-gray-400">
-                                                    No Record Available.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                <ReportingTable data={labaRugiSaldoRecords} />
                             </div>
                         </span>
                     </div>
 
                     {/* Kertas Kerja */}
                     <div className="grid gap-5">
-                        <h2 className="text-lg font-medium sm:text-xl">Kertas Kerja {monthLabel}</h2>
-                        <div className="relative overflow-auto rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <Table>
-                                <TableHeader>
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-medium sm:text-xl">Work Paper {monthLabel}</h2>
+                            <a
+                                href={route('reporting.export.worksheet', { date: selectedDate }) as unknown as string}
+                                className="inline-flex items-center justify-center rounded-md border bg-primary px-3 py-2 text-sm text-primary-foreground transition-all duration-300 ease-in-out hover:bg-primary/80"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                Export Excel
+                            </a>
+                        </div>
+
+                        <div className="relative min-h-[20rem] overflow-auto rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                            <Table className="min-h-[20rem]">
+                                <TableHeader className='bg-muted'>
                                     <TableRow>
                                         <TableHead className="w-[90px] text-center">Reff</TableHead>
                                         <TableHead className="min-w-[180px]">Akun</TableHead>
                                         {/* Neraca Saldo */}
-                                        <TableHead className="bg-yellow-400/20 text-center" colSpan={2}>
+                                        <TableHead className="text-center" colSpan={2}>
                                             Neraca Saldo
                                         </TableHead>
                                         {/* Laba/Rugi */}
-                                        <TableHead className="bg-red-400/20 text-center" colSpan={2}>
+                                        <TableHead className="text-center" colSpan={2}>
                                             Laba/Rugi
                                         </TableHead>
                                         {/* Neraca */}
-                                        <TableHead className="bg-green-400/20 text-center" colSpan={2}>
+                                        <TableHead className="text-center" colSpan={2}>
                                             Neraca
                                         </TableHead>
                                     </TableRow>

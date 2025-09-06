@@ -6,30 +6,24 @@ use App\Http\Controllers\AccountController;
 
 use App\Models\Product;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariantController;
 use App\Http\Controllers\JurnalUmumController;
 use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\ShopeeImportController;
+use App\Http\Controllers\AccountBalanceController;
 
-
+// Company Profile
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/all-products', [HomeController::class, 'products'])->name('products');
 Route::get('/productShow/{product}', [HomeController::class, 'showProduct'])->name('products.show');
-// Route::get('/productShow/{id}', function ($id) {
-//     $product = Product::findOrFail($id);
-//     return Inertia::render('Home/ProductDetail', [
-//         'product' => $product
-//     ]);
-// })->name('products.show');\
 
 
+// Dashboard Routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
 
-
+    Route::resource('dashboard', DashboardController::class);
     Route::resource('product', ProductController::class);
     // Nested resource for product variants
     Route::resource('product.variants', ProductVariantController::class)->only(['store', 'update', 'destroy']);
@@ -47,15 +41,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Transactions/Index');
     })->name('transactions.index');
 
-    // Activity - Accounting Route
-    // Route::get('jurnal-umum', function () {
-    //     return Inertia::render('JurnalUmum/Index');
-    // })->name('jurnalUmum.index');
-    // Route::get('reporting', function () {
-    //     return Inertia::render('Reporting/Index');
-    // })->name('reporting.index');
+    Route::post('/equity-report', [AccountBalanceController::class, 'generate'])
+    ->name('equity.generate');
 });
 
+
+// Handling 404 - Page Not Found
 Route::fallback(function () {
     return Inertia::render('404');
 });

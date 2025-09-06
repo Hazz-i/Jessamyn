@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/react';
 export default function NotFound() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12">
-            <div className="mx-auto max-w-3xl text-center">
+            <div className="mx-auto max-w-xl text-center">
                 <div className="inline-block rounded-full bg-emerald-50 p-6">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -18,24 +18,17 @@ export default function NotFound() {
                     </svg>
                 </div>
 
-                <h1 className="mt-8 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">404 — Page not found</h1>
+                <h1 className="mt-8 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Page not found</h1>
                 <p className="mt-4 text-base text-gray-600">
-                    Sorry, we couldn’t find the page you’re looking for. It may have been moved or removed.
+                    Sorry, we couldn't find the page you're looking for. <br />
+                    It may have been moved or removed. If you typed the address manually, double-check the spelling.
                 </p>
 
                 <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                     <Link href="/">
-                        <Button className="px-6 py-2">Back to home</Button>
-                    </Link>
-
-                    <Link href="/contact" className="mt-2 sm:mt-0">
-                        <Button variant="outline" className="px-6 py-2">
-                            Contact support
-                        </Button>
+                        <Button>Back to home</Button>
                     </Link>
                 </div>
-
-                <p className="mt-6 text-sm text-gray-500">If you typed the address manually, double-check the spelling.</p>
             </div>
         </div>
     );

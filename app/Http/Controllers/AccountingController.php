@@ -16,14 +16,93 @@ class AccountingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Load related account so the frontend can display the account name
-        $records = Accounting::with(['account:id,name,reff'])->latest()->get();
+        // Parse optional month filter: accepts 'YYYY-MM' or full date 'YYYY-MM-DD'. Defaults to current month.
+        $raw = $request->input('date');
+        if ($raw && preg_match('/^\d{4}-\d{2}$/', (string) $raw)) {
+            $year = (int) substr($raw, 0, 4);
+            $month = (int) substr($raw, 5, 2);
+        } else {
+            $ts = $raw ? strtotime((string) $raw) : time();
+            $year = (int) date('Y', $ts);
+            $month = (int) date('m', $ts);
+        }
+        $selectedPeriod = sprintf('%04d-%02d', $year, $month);
+
+        // Load records for the selected period and all accounts for lookup
+        $records = Accounting::with(['account:id,name,reff'])
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderBy('date')
+            ->get();
+
         $accounts = Account::select('id', 'name', 'reff')->orderBy('name')->get();
+        $accountsById = $accounts->keyBy('id');
+
+        // Aggregate per account: net = debit - credit (positive => debit column, negative => credit column)
+        $agg = [];
+        foreach ($records as $r) {
+            $id = (int) $r->account_id;
+            if (!isset($agg[$id])) {
+                $acc = $r->account ?: $accountsById->get($id);
+                $agg[$id] = [
+                    'account_id' => (string) $id,
+                    'name' => $acc->name ?? ('#'.$id),
+                    'reff' => $acc->reff ?? '',
+                    'debitSum' => 0.0,
+                    'creditSum' => 0.0,
+                ];
+            }
+            $agg[$id]['debitSum'] += (float) ($r->debit ?? 0);
+            $agg[$id]['creditSum'] += (float) ($r->credit ?? 0);
+        }
+
+        $neracaSaldo = [];
+        $labaRugi = [];
+        $neraca = [];
+
+        foreach ($agg as $row) {
+            $net = (float) $row['debitSum'] - (float) $row['creditSum'];
+            $entry = [
+                'account_id' => $row['account_id'],
+                'reff' => $row['reff'],
+                'name' => $row['name'],
+                'debitAmount' => $net > 0 ? $net : 0,
+                'creditAmount' => $net < 0 ? abs($net) : 0,
+            ];
+
+            $reff = (string) ($row['reff'] ?? '');
+            if (preg_match('/^[1-3]/', $reff)) {
+                $neracaSaldo[] = $entry; // trial balance subset for 1,2,3
+                $neraca[] = $entry;      // balance sheet uses same accounts
+            } elseif (preg_match('/^[4-7]/', $reff)) {
+                $labaRugi[] = $entry;    // income statement subset for 4-7
+            }
+        }
+
+        // Sort consistently by reff then name
+        $sorter = function ($a, $b) {
+            $ra = $a['reff'] ?? '';
+            $rb = $b['reff'] ?? '';
+            if ($ra === $rb) {
+                return strcmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
+            }
+            return strcmp($ra, $rb);
+        };
+        usort($neracaSaldo, $sorter);
+        usort($labaRugi, $sorter);
+        usort($neraca, $sorter);
+
         return inertia('Reporting/Index', [
-            'records' => $records,
+            'records' => $records, // already filtered by month
             'accounts' => $accounts,
+            'reporting' => [
+                'period' => $selectedPeriod,
+                'neraca_saldo' => $neracaSaldo,
+                'laba_rugi' => $labaRugi,
+                'neraca' => $neraca,
+            ],
         ]);
     }
 
@@ -80,18 +159,25 @@ class AccountingController extends Controller
      */
     public function exportWorksheet(Request $request): StreamedResponse
     {
+        // Accept both YYYY-MM and YYYY-MM-DD formats
         $request->validate([
-            'date' => ['nullable', 'date'],
+            'date' => ['nullable', 'string'],
         ]);
 
-        $date = $request->input('date') ?: now()->toDateString();
-        $dt = strtotime($date);
-        $year = (int)date('Y', $dt);
-        $month = (int)date('m', $dt);
+        $raw = $request->input('date');
+        if ($raw && preg_match('/^\d{4}-\d{2}$/', (string) $raw)) {
+            $year = (int) substr($raw, 0, 4);
+            $month = (int) substr($raw, 5, 2);
+            $dt = strtotime($raw.'-01');
+        } else {
+            $dt = strtotime($raw ?: now()->toDateString());
+            $year = (int)date('Y', $dt);
+            $month = (int)date('m', $dt);
+        }
 
         $records = Accounting::with(['account:id,name,reff'])
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
             ->get();
 
         // Aggregate per account: net = debit - credit (positive => debit)
