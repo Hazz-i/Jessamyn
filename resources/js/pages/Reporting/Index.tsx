@@ -5,7 +5,7 @@ import ReportingTable from '@/components/ui/reporting-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -170,6 +170,9 @@ export default function Reporting({ records, accounts, reporting }: any) {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <h1 className="text-xl font-medium sm:text-2xl">Reporting</h1>
                         <div className="flex items-center gap-2">
+                            <Link href={route('reporting.all', { period: selectedDate }) as unknown as string}>
+                                <Button variant="outline">All Report</Button>
+                            </Link>
                             <Input
                                 type="month"
                                 value={selectedDate}
@@ -262,7 +265,7 @@ export default function Reporting({ records, accounts, reporting }: any) {
 
                         <div className="relative min-h-[20rem] overflow-auto rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                             <Table className="min-h-[20rem]">
-                                <TableHeader className='bg-muted'>
+                                <TableHeader className="bg-muted">
                                     <TableRow>
                                         <TableHead className="w-[90px] text-center">Reff</TableHead>
                                         <TableHead className="min-w-[180px]">Akun</TableHead>

@@ -31,8 +31,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('accounts', AccountController::class);
     Route::resource('jurnal-umum', JurnalUmumController::class)
         ->parameters(['jurnal-umum' => 'accounting']);
-    Route::resource('reporting', AccountingController::class);
+    // Specific reporting pages first to avoid conflict with resource wildcard
+    Route::get('/reporting/all-report', [AccountBalanceController::class, 'show'])->name('reporting.all');
     Route::get('reporting/export/worksheet', [AccountingController::class, 'exportWorksheet'])->name('reporting.export.worksheet');
+    Route::resource('reporting', AccountingController::class);
 
     Route::post('shopee/preview', [ShopeeImportController::class, 'preview'])->name('shopee.preview');
     Route::post('shopee/commit',  [ShopeeImportController::class, 'commit'])->name('shopee.commit');
@@ -43,6 +45,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/equity-report', [AccountBalanceController::class, 'generate'])
     ->name('equity.generate');
+
+    
 });
 
 
