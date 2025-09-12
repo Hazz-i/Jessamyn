@@ -1,20 +1,30 @@
+import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 
-import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-
 interface UserMenuContentProps {
     user: User;
 }
-
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const page = usePage();
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
         cleanup();
-        router.flushAll();
+        router.post(route('logout'));
     };
 
     return (
@@ -31,16 +41,32 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild tooltip={{ children: 'Log out' }}>
-                            <Link
-                                className="block w-full cursor-pointer text-red-500 hover:bg-red-500/10 hover:text-red-600"
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                                onClick={handleLogout}
-                            >
-                                <i className="bx bx-log-out mr-2" />
-                                Log out
-                            </Link>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <p className="block w-full cursor-pointer rounded-lg p-2 text-sm text-destructive hover:bg-red-500/10 hover:text-red-600">
+                                        <i className="bx bx-log-out mr-2" />
+                                        Logout
+                                    </p>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will log you out of the current session.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            className="cursor-pointer bg-destructive text-white hover:bg-destructive"
+                                            onClick={handleLogout}
+                                        >
+                                            <i className="bx bx-log-out mr-2" />
+                                            Log out
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

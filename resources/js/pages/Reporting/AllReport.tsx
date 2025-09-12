@@ -1,4 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 type Props = {
@@ -24,6 +25,17 @@ type Props = {
     incomeTax: number;
     netIncome: number;
 };
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Reporting',
+        href: route('reporting.index'),
+    },
+    {
+        title: 'All Report',
+        href: route('reporting.all'),
+    },
+];
 
 const currency = (n?: number) => {
     if (n === undefined || n === null || isNaN(n as any)) return '-';
@@ -71,7 +83,7 @@ export default function AllReport(props: Props) {
     })();
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Laporan Laba Rugi" />
 
             <div className="mx-auto w-full max-w-4xl p-6">

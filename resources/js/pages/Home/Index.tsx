@@ -24,29 +24,41 @@ const Welcome = () => {
             {/* Navbar */}
             <AppNavbar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
+            {/* Mobile: bg image with overlay text */}
+            <div className="relative flex h-[90vh] w-full flex-col items-center justify-center overflow-hidden shadow-sm md:hidden">
+                <img src={heroUrl} alt="Hero" className="absolute inset-0 h-full w-full object-cover" />
+                <div className="relative z-10 flex h-full w-full flex-col items-start justify-center bg-black/30 px-6 py-10">
+                    <h1 className="text-3xl font-bold text-white drop-shadow-lg">Jessamyn: Essentials for Mind, Body, and Soul</h1>
+                    <p className="mt-6 text-base text-white drop-shadow-md">
+                        Nikmati ketenangan alami dengan rangkaian essential oil murni dari alam. Diracik dengan cinta dan kehati-hatian untuk
+                        menyelaraskan tubuh dan jiwa Anda.
+                    </p>
+                    <Button className="mt-8 min-w-[140px] bg-emerald-500 px-6 text-white">Shop Now!</Button>
+                </div>
+            </div>
             {/* HERO */}
-            <section className="container mx-auto grid h-[90vh] grid-cols-1 gap-4 px-4 md:grid-cols-2">
-                <div className="flex flex-col items-start justify-center gap-16 rounded-3xl bg-[#F1F9F1] p-6 md:p-10">
+            <section className="container mx-auto hidden h-[90vh] px-4 md:grid md:grid-cols-2 md:gap-4">
+                {/* Desktop: split layout */}
+                <div className="hidden flex-col items-start justify-center gap-5 rounded-3xl bg-[#F1F9F1] p-10 shadow-sm md:flex">
                     <div className="flex flex-col items-start justify-center">
-                        <h1 className="text-3xl font-bold text-primary-foreground md:text-4xl">Jessamyn: Essentials for Mind, Body, and Soul</h1>
-                        <p className="mt-2 text-base md:text-xl">
+                        <h1 className="text-4xl font-bold text-primary-foreground">Jessamyn: Essentials for Mind, Body, and Soul</h1>
+                        <p className="mt-10 text-xl">
                             Nikmati ketenangan alami dengan rangkaian essential oil murni dari alam. Diracik dengan cinta dan kehati-hatian untuk
                             menyelaraskan tubuh dan jiwa Anda.
                         </p>
                     </div>
                     <Button className="min-w-[140px] px-6">Shop Now!</Button>
                 </div>
-
-                <div className="relative overflow-hidden rounded-3xl">
+                <div className="relative hidden overflow-hidden rounded-3xl shadow-sm md:block">
                     <img src={heroUrl} alt="Hero" className="absolute inset-0 h-full w-full object-cover" />
                 </div>
             </section>
 
             {/* STATS */}
-            <section className="container mx-auto grid gap-28 py-16">
-                <div className="mx-auto grid grid-cols-1 gap-5 px-10 md:grid-cols-2">
-                    <h2 className="flex items-center px-5 text-2xl md:text-5xl">JESSAMYN: Essentials for Mind, Body, and Soul</h2>
-                    <p className="flex items-center justify-center text-justify text-gray-600">
+            <section className="container mx-auto grid gap-5 py-5 sm:gap-20 sm:py-16">
+                <div className="mx-auto grid grid-cols-1 gap-5 px-4 sm:px-10 md:grid-cols-2">
+                    <h2 className="flex items-center text-2xl sm:px-5 md:text-5xl">JESSAMYN: Essentials for Mind, Body, and Soul</h2>
+                    <p className="flex items-center justify-center text-justify text-base text-gray-600 sm:text-lg">
                         Jessamyn adalah pilihan alami untuk menjaga kesehatan tubuh, menenangkan pikiran, dan menyegarkan jiwa. Kami menghadirkan
                         minyak herbal murni yang diracik dari bahan pilihan berkualitas tinggi, sehingga aman digunakan sehari-hari untuk relaksasi,
                         pijat, maupun aromaterapi. Setiap produk kami diciptakan untuk membantu Anda menemukan keseimbangan hidup yang sehat, alami,
@@ -54,20 +66,20 @@ const Welcome = () => {
                     </p>
                 </div>
 
-                <div className="flex items-center justify-around">
-                    <span className="flex flex-col items-center justify-center gap-1">
-                        <i className="bx bx-user text-5xl"></i>
-                        <p className="text-sm">Produk Herbal Premium</p>
+                <div className="grid grid-cols-1 gap-3 px-2 sm:grid-cols-3 sm:gap-8 sm:px-0">
+                    <span className="flex items-center gap-2 rounded-sm border px-2 py-3 shadow sm:flex-col sm:justify-center sm:rounded-none sm:border-none sm:px-0 sm:py-0 sm:shadow-none">
+                        <i className="bx bx-user text-2xl sm:text-5xl"></i>
+                        <p className="text-sm sm:text-base">Produk Herbal Premium</p>
                     </span>
 
-                    <span className="flex flex-col items-center justify-center gap-1">
-                        <i className="bx bx-user text-5xl"></i>
-                        <p className="text-sm">Relaksasi & Aromaterapi</p>
+                    <span className="flex items-center gap-2 rounded-sm border px-2 py-3 shadow sm:flex-col sm:justify-center sm:rounded-none sm:border-none sm:px-0 sm:py-0 sm:shadow-none">
+                        <i className="bx bx-user text-2xl sm:text-5xl"></i>
+                        <p className="text-sm sm:text-base">Relaksasi & Aromaterapi</p>
                     </span>
 
-                    <span className="flex flex-col items-center justify-center gap-1">
-                        <i className="bx bx-user text-5xl"></i>
-                        <p className="text-sm">Konsultasi Kesehatan Alami</p>
+                    <span className="flex items-center gap-2 rounded-sm border px-2 py-3 shadow sm:flex-col sm:justify-center sm:rounded-none sm:border-none sm:px-0 sm:py-0 sm:shadow-none">
+                        <i className="bx bx-user text-2xl sm:text-5xl"></i>
+                        <p className="text-sm sm:text-base">Konsultasi Kesehatan Alami</p>
                     </span>
                 </div>
             </section>
@@ -75,7 +87,7 @@ const Welcome = () => {
             {/* About US */}
             <section
                 id="about-section"
-                className="container mx-auto flex h-screen flex-col items-start gap-8 px-4 py-12 md:flex-row md:gap-12 md:px-[6rem] md:py-20"
+                className="container mx-auto flex flex-col items-start gap-8 px-4 py-10 sm:py-16 md:flex-row md:gap-12 md:px-[6rem] md:py-20"
             >
                 <div className="my-auto flex max-w-xl flex-col items-start justify-center gap-2 space-y-5">
                     <span>
@@ -92,8 +104,8 @@ const Welcome = () => {
                     </p>
                 </div>
 
-                <div className="flex flex-col gap-1 md:flex-1">
-                    <div className="relative h-64 overflow-hidden rounded-lg shadow-sm ring-1 ring-gray-100 md:h-[34rem]">
+                <div className="flex w-full flex-col gap-3 md:flex-1">
+                    <div className="relative h-56 overflow-hidden rounded-lg shadow-sm ring-1 ring-gray-100 sm:h-72 md:h-[34rem]">
                         <img
                             src="https://images.unsplash.com/photo-1583505680130-b37f8049fbcf?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0"
                             alt="Greenhouse hydroponics"
@@ -101,15 +113,15 @@ const Welcome = () => {
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
-                        <div className="relative h-40 overflow-hidden rounded-lg shadow-sm ring-1 ring-gray-100 md:h-48">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div className="relative h-56 overflow-hidden rounded-lg shadow-sm ring-1 ring-gray-100 sm:h-48">
                             <img
                                 src="https://plus.unsplash.com/premium_photo-1731942726418-1db7dc2d32fc?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0"
                                 alt="Farmers review plants"
                                 className="h-full w-full object-cover"
                             />
                         </div>
-                        <div className="relative h-40 overflow-hidden rounded-lg shadow-sm ring-1 ring-gray-100 md:h-48">
+                        <div className="relative h-56 overflow-hidden rounded-lg shadow-sm ring-1 ring-gray-100 sm:h-48">
                             <img
                                 src="https://images.unsplash.com/photo-1709372026846-8d2fda4a7ee5?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0"
                                 alt="Farmer in the field with laptop"
@@ -129,18 +141,22 @@ const Welcome = () => {
                             Discover the transformative power of our farming solutions and take your farming experience to a higher level.
                         </p>
                     </div>
-                    <div className="mt-4 md:mt-0">
-                        <Button variant="outline" className="hidden border-gray-200 text-primary sm:inline-flex">
-                            <Link href="/all-products">Show More Products</Link>
-                        </Button>
-                    </div>
+                    {Array.isArray(products) && products.length > 0 && (
+                        <div className="mt-4 md:mt-0">
+                            <Button variant="outline" className="hidden border-gray-200 text-primary sm:inline-flex">
+                                <Link href="/all-products">Show More Products</Link>
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
                     {Array.isArray(products) && products.length > 0 ? (
                         products.map((p) => <ProductCard key={p.id} product={p} />)
                     ) : (
-                        <div className="col-span-full text-center text-gray-400">No products available.</div>
+                        <div className="col-span-full flex min-h-[40vh] w-full items-center justify-center">
+                            <p className="text-gray-400">No products available.</p>
+                        </div>
                     )}
                 </div>
             </section>
@@ -166,14 +182,18 @@ const Welcome = () => {
             </section>
 
             {/* CONTACT US */}
-            <section id="contact-section" className="container mx-auto grid grid-cols-1 gap-8 py-16 md:grid-cols-2 md:px-[6rem] md:py-20">
+            <section
+                id="contact-section"
+                className="container mx-auto grid grid-cols-1 gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 md:px-[6rem] md:py-20"
+            >
                 {/* Map */}
-                <div className="flex items-center justify-center">
+                <div className="order-1 flex items-center justify-center sm:order-0">
                     <iframe
                         title="Jessamyn Store Map"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3952.726964836934!2d110.44100007501144!3d-7.819963779963219!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a5e2e2e2e2e2e%3A0x2e2e2e2e2e2e2e2e!2sJessamyn%20Store!5e0!3m2!1sen!2sid!4v1692950000000!5m2!1sen!2sid"
                         width="100%"
-                        height="700"
+                        height="350"
+                        className="max-h-[350px] min-h-[220px] w-full rounded-2xl shadow-md md:max-h-[700px] md:min-h-[400px]"
                         style={{ border: '0', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
                         allowFullScreen={true}
                         loading="lazy"
@@ -182,7 +202,7 @@ const Welcome = () => {
                 </div>
 
                 {/* Contact Info */}
-                <div className="flex flex-col justify-center gap-6 px-2 md:px-8">
+                <div className="order-0 flex flex-col justify-center gap-6 px-2 sm:order-1 sm:px-6 md:px-8">
                     <span>
                         <h2 className="mb-2 text-2xl font-semibold text-primary-foreground md:text-4xl">Contact Us</h2>
                         <p className="mb-4 text-gray-700">
@@ -193,7 +213,7 @@ const Welcome = () => {
 
                     <div className="flex flex-col gap-5">
                         {/* Email */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <span className="inline-flex h-9 w-9 items-center justify-center rounded bg-[#D6E3D0] text-primary-foreground">
                                 <i className="bx bx-envelope text-2xl" />
                             </span>
@@ -203,7 +223,7 @@ const Welcome = () => {
                             </div>
                         </div>
                         {/* Location */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <span className="inline-flex h-9 w-9 items-center justify-center rounded bg-[#D6E3D0] text-primary-foreground">
                                 <i className="bx bx-map text-2xl" />
                             </span>
@@ -213,7 +233,7 @@ const Welcome = () => {
                             </div>
                         </div>
                         {/* Whatsapp */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <span className="inline-flex h-9 w-9 items-center justify-center rounded bg-[#D6E3D0] text-primary-foreground">
                                 <i className="bx bxl-whatsapp text-2xl" />
                             </span>

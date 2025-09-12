@@ -18,7 +18,7 @@ const AppNavbar = ({ mobileOpen, setMobileOpen }: AppNavbarProps) => {
     return (
         <>
             {/* header */}
-            <header className="container mx-auto flex items-center justify-between md:px-8">
+            <header className="container mx-auto flex items-center justify-between bg-transparent md:px-8">
                 <div className="relative h-20 w-auto max-w-[220px]">
                     <img src="/jessamynLogo.png" alt="Logo" className="h-full w-full object-cover" />
                 </div>

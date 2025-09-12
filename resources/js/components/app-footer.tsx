@@ -15,7 +15,7 @@ const AppFooter = () => {
                         </p>
                     </div>
 
-                    <div className="flex w-full items-start justify-between">
+                    <div className="flex w-full flex-col gap-6 md:flex-row md:items-start md:justify-between">
                         {/* Company */}
                         <div>
                             <h4 className="mb-2 font-semibold text-primary-foreground">Company</h4>
@@ -39,7 +39,7 @@ const AppFooter = () => {
                         <div>
                             <h4 className="mb-2 font-semibold text-primary-foreground">Get In Touch</h4>
                             <p className="mb-2 text-sm">jessamyncompany@gmail.com</p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-primary-foreground text-primary">
                                     <i className="bx bxl-tiktok text-xl" />
                                 </span>
@@ -61,7 +61,7 @@ const AppFooter = () => {
                         <span className="mr-1">&#169;</span>
                         2025 Jessamyn, All rights reserved.
                     </div>
-                    <div className="flex gap-6 text-sm text-primary-foreground">
+                    <div className="flex flex-col gap-2 text-sm text-primary-foreground sm:flex-row sm:gap-6">
                         <span>Terms & Conditions</span>
                         <span>Privacy Policy</span>
                     </div>
