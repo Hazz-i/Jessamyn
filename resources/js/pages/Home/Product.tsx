@@ -9,6 +9,8 @@ type ProductType = {
     name: string;
     price: number;
     image: string;
+    category: string;
+    product_variants: { id: number; product_id: number; variant: string; price: number; stock_qty: number }[];
 };
 
 type Paginator<T> = {
@@ -28,7 +30,7 @@ const carouselImages = [
 ];
 
 const Product = () => {
-    const { products } = usePage().props as { products: Paginator<ProductType> };
+    const { products } = usePage().props as any;
     const paginated = products?.data || [];
     const currentPage = products?.current_page || 1;
     const lastPage = products?.last_page || 1;
@@ -50,39 +52,24 @@ const Product = () => {
                 <AppNavbar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
                 {/* Carousel */}
-                <div
-                    className="relative w-full overflow-hidden rounded-lg bg-gray-200"
-                    style={{ height: 250 }}
-                >
-                    <img
-                        src={carouselImages[carouselIndex]}
-                        alt="carousel"
-                        className="h-full w-full object-cover transition-all duration-500"
-                    />
+                <div className="relative w-full overflow-hidden rounded-lg bg-gray-200" style={{ height: 250 }}>
+                    <img src={carouselImages[carouselIndex]} alt="carousel" className="h-full w-full object-cover transition-all duration-500" />
                     <div className="absolute right-0 bottom-4 left-0 flex justify-center gap-2">
                         {carouselImages.map((_, idx) => (
                             <span
                                 key={idx}
-                                className={`inline-block h-2 w-2 rounded-full ${
-                                    carouselIndex === idx ? 'bg-gray-800' : 'bg-gray-400'
-                                }`}
+                                className={`inline-block h-2 w-2 rounded-full ${carouselIndex === idx ? 'bg-gray-800' : 'bg-gray-400'}`}
                             />
                         ))}
                     </div>
                 </div>
 
-                <h2 className="mt-8 text-center text-2xl font-bold text-gray-800">
-                    Our Product
-                </h2>
+                <h2 className="mt-8 text-center text-2xl font-bold text-gray-800">Our Product</h2>
 
                 {/* Product Grid */}
-                <div className="grid grid-cols-1 gap-8 px-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid min-h-screen grid-cols-1 gap-8 px-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {paginated.map((p: ProductType) => (
-                        <Link
-                            key={p.id}
-                            href={route('products.show', p.id)} // 🔥 Route detail
-                            preserveScroll
-                        >
+                        <Link key={p.id} href={route('products.show', p.id)} preserveScroll>
                             <ProductCard product={p} />
                         </Link>
                     ))}

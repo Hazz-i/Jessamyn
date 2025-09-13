@@ -4,7 +4,6 @@ import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { UserMenuContent } from './user-menu-content';
 
-const AppLogo = './jessamynLogo.png';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -51,7 +50,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
-                                <img src={AppLogo} alt="logo aplikasi" />
+                                <img src="/jessamynLogo.png" alt="logo aplikasi" />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -64,7 +63,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <UserMenuContent user={auth.user} />
+                <UserMenuContent />
             </SidebarFooter>
         </Sidebar>
     );

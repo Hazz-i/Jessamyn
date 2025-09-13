@@ -13,24 +13,35 @@ use App\Http\Controllers\JurnalUmumController;
 use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\ShopeeImportController;
 use App\Http\Controllers\AccountBalanceController;
+use App\Http\Controllers\RajaOngkirController;
 
 // Company Profile
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/all-products', [HomeController::class, 'products'])->name('products');
-Route::get('/productShow/{product}', [HomeController::class, 'showProduct'])->name('products.show');
+Route::get('/product-show/{product}', [HomeController::class, 'showProduct'])->name('products.show');
+Route::get('/product-order/{product}', [HomeController::class, 'orderProduct'])->name('products.order');
 
+// Raja Onkir
+Route::get('/provinces', [RajaOngkirController::class, 'getProvinces']);
+Route::get('/cities/{provinceId}', [RajaOngkirController::class, 'getCities']);
+Route::get('/districts/{cityId}', [RajaOngkirController::class, 'getDistricts']);
+Route::get('/cost', [RajaOngkirController::class, 'calculateShippingCost']);
+
+// Tripay
+# TODO
 
 // Dashboard Routes
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('dashboard', DashboardController::class);
     Route::resource('product', ProductController::class);
-    // Nested resource for product variants
+    
     Route::resource('product.variants', ProductVariantController::class)->only(['store', 'update', 'destroy']);
     
     Route::resource('accounts', AccountController::class);
     Route::resource('jurnal-umum', JurnalUmumController::class)
         ->parameters(['jurnal-umum' => 'accounting']);
+        
     // Specific reporting pages first to avoid conflict with resource wildcard
     Route::get('/reporting/all-report', [AccountBalanceController::class, 'show'])->name('reporting.all');
     Route::get('reporting/export/worksheet', [AccountingController::class, 'exportWorksheet'])->name('reporting.export.worksheet');
@@ -50,7 +61,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-// Handling 404 - Page Not Found
 Route::fallback(function () {
     return Inertia::render('404');
 });

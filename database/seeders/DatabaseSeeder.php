@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             ['101','Kas','Kas kecil/laci kas toko'],
             ['102','Bank','Rekening giro/tabungan operasional'],
             ['103','Piutang Usaha','Tagihan penjualan kredit ke pelanggan'],
-            ['104','Cadangan Kerugian Piutang','Akun kontra aset (–)'],
+            ['104','Cadangan Kerugian Piutang','Akun kontra aset (-)'],
             ['114','Persediaan Barang Dagang','Persediaan baby oil untuk dijual'],
             ['115','Uang Muka Pembelian','DP ke pemasok'],
             ['116','Beban Dibayar Dimuka','Sewa/asuransi dibayar di muka'],
@@ -45,8 +45,8 @@ class DatabaseSeeder extends Seeder
             // 12x A S E T   T E T A P
             ['121','Peralatan Toko','Etalase, rak, timbangan, alat display'],
             ['122','Kendaraan Operasional','Motor/van pengiriman'],
-            ['123','Akumulasi Penyusutan Peralatan','Kontra aset (–)'],
-            ['124','Akumulasi Penyusutan Kendaraan','Kontra aset (–)'],
+            ['123','Akumulasi Penyusutan Peralatan','Kontra aset (-)'],
+            ['124','Akumulasi Penyusutan Kendaraan','Kontra aset (-)'],
 
             // 2xx L I A B I L I T A S
             ['201','Utang Usaha','Kewajiban ke pemasok'],
@@ -112,7 +112,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
-        AccountingSeeder::class,     // Jurnal Umum Agustus
+        AccountingSeeder::class,     
     ]);
 
     }

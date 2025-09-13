@@ -12,13 +12,9 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { type User } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 
-interface UserMenuContentProps {
-    user: User;
-}
-export function UserMenuContent({ user }: UserMenuContentProps) {
+export function UserMenuContent() {
     const page = usePage();
     const cleanup = useMobileNavigation();
 

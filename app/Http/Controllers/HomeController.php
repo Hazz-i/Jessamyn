@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $products = Product::limit(4)->get();
+        $products = Product::with([
+            'user:id,name',
+            'productVariants' => function ($q) {
+                $q->select('id', 'product_id', 'variant', 'price', 'stock_qty')
+                    ->orderBy('price');
+            },
+        ])->orderBy('created_at', 'desc')->limit(8)->get();
 
         return Inertia::render('Home/Index', [
             'products' => $products
@@ -18,7 +25,13 @@ class HomeController extends Controller
 
     public function products()
     {
-        $products = Product::orderBy('created_at', 'desc')->paginate(12);
+        $products = Product::with([
+            'user:id,name',
+            'productVariants' => function ($q) {
+                $q->select('id', 'product_id', 'variant', 'price', 'stock_qty')
+                    ->orderBy('price');
+            },
+        ])->orderBy('created_at', 'desc')->paginate(12);
 
         return Inertia::render('Home/Product', [
             'products' => $products
@@ -28,7 +41,7 @@ class HomeController extends Controller
     public function showProduct(Product $product)
     {
         $product->load([
-            'user:id,name', // tetap load user tapi hanya ambil name
+            'user:id,name', 
             'productVariants' => function ($q) {
                 $q->select('id', 'product_id', 'variant', 'price', 'stock_qty')
                     ->orderBy('price');
@@ -57,9 +70,23 @@ class HomeController extends Controller
                 : [],
         ];
 
-        return Inertia::render('Home/ProductDetail', [
+        return Inertia::render('Home/DetailsHome', [
             'product' => $payload,
+            'auth' => auth()->user(),
         ]);
     }
 
+    public function orderProduct(Product $product, Request $request)
+    {
+        $name = $request->get('name');
+        $price = $request->get('price');
+        $variant = $request->get('variant');
+        $qty = $request->get('qty');
+        $total = $request->get('total');
+        
+        return Inertia::render('Home/ProductOrder', [
+            'product' => $product,
+            'order' => compact('name', 'price', 'variant', 'qty', 'total'),
+        ]);
+    }
 }

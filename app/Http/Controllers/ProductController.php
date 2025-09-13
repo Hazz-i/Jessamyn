@@ -112,6 +112,9 @@ class ProductController extends Controller
 
         return Inertia::render('Products/Details', [
             'product' => $payload,
+            'auth' => [
+                'user' => Auth::user(),
+            ],
         ]);
     }
 
