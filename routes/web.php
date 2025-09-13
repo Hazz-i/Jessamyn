@@ -47,8 +47,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('reporting/export/worksheet', [AccountingController::class, 'exportWorksheet'])->name('reporting.export.worksheet');
     Route::resource('reporting', AccountingController::class);
 
-    Route::post('shopee/preview', [ShopeeImportController::class, 'preview'])->name('shopee.preview');
-    Route::post('shopee/commit',  [ShopeeImportController::class, 'commit'])->name('shopee.commit');
+    Route::post('/shopee/preview', [ShopeeImportController::class, 'preview'])->name('shopee.preview');
+    Route::post('/shopee/commit',  [ShopeeImportController::class, 'commit'])->name('shopee.commit');
 
     Route::get('transactions', function () {
         return Inertia::render('Transactions/Index');
